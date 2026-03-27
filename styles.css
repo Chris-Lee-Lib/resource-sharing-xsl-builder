@@ -212,6 +212,20 @@ textarea {
   word-break: break-word;
 }
 
+.rendered-panel #rendered-preview {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  min-height: 220px;
+  overflow: auto;
+  padding: 20px;
+}
+
+.rendered-panel #rendered-preview:empty::before {
+  color: var(--muted);
+  content: 'Rendered output will appear here after you generate the XSL.';
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;

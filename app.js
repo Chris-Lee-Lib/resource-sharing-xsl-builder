@@ -1,9 +1,11 @@
 const form = document.querySelector('#builder-form');
 const preview = document.querySelector('#xsl-preview');
+const renderedPreview = document.querySelector('#rendered-preview');
 const resetButton = document.querySelector('#reset-button');
 const letterSpecificQuestions = document.querySelector('#letter-specific-questions');
 const letterQuestionGroups = Array.from(document.querySelectorAll('[data-letter-question]'));
 const templateCache = {};
+let sampleXmlCache = '';
 
 const letterDefinitions = {
   'pull-slip-letter': {
@@ -350,21 +352,72 @@ async function getTemplateText(state) {
   return applyTemplateReplacements(templateCache[definition.templateFile], state);
 }
 
+async function getSampleXml() {
+  if (sampleXmlCache) {
+    return sampleXmlCache;
+  }
+
+  const response = await fetch('./sample-input.xml');
+
+  if (!response.ok) {
+    throw new Error('Failed to load sample-input.xml');
+  }
+
+  sampleXmlCache = await response.text();
+  return sampleXmlCache;
+}
+
+async function renderTransformedOutput(xslText) {
+  renderedPreview.innerHTML = '';
+
+  if (!window.XSLTProcessor) {
+    renderedPreview.textContent = 'This browser does not support in-page XSLT preview.';
+    return;
+  }
+
+  try {
+    const xmlText = await getSampleXml();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+    const xslDoc = parser.parseFromString(xslText, 'application/xml');
+
+    if (xmlDoc.querySelector('parsererror') || xslDoc.querySelector('parsererror')) {
+      renderedPreview.textContent = 'The sample XML or generated XSL could not be parsed for preview.';
+      return;
+    }
+
+    const processor = new XSLTProcessor();
+    processor.importStylesheet(xslDoc);
+    const resultDocument = processor.transformToFragment(xmlDoc, document);
+
+    renderedPreview.appendChild(resultDocument);
+  } catch (error) {
+    console.error(error);
+    renderedPreview.textContent = 'Rendered preview is not available yet for this template.';
+  }
+}
+
 async function render() {
   const state = readFormState();
 
   if (!state.letterType) {
     preview.textContent = '';
+    renderedPreview.innerHTML = '';
     return;
   }
 
   preview.textContent = 'Loading template preview...';
+  renderedPreview.textContent = 'Rendering sample output...';
 
   try {
-    preview.textContent = await getTemplateText(state);
+    const xslText = await getTemplateText(state);
+    preview.textContent = xslText;
+    await renderTransformedOutput(xslText);
   } catch (error) {
     console.error(error);
-    preview.textContent = assembleScaffoldXsl(state);
+    const fallbackXsl = assembleScaffoldXsl(state);
+    preview.textContent = fallbackXsl;
+    await renderTransformedOutput(fallbackXsl);
   }
 }
 
@@ -392,6 +445,7 @@ resetButton.addEventListener('click', () => {
 
     syncLetterSpecificQuestions();
     preview.textContent = '';
+    renderedPreview.innerHTML = '';
   });
 });
 
