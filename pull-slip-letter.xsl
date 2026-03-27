@@ -17,7 +17,7 @@
        *********************   LIBRARY LOGO CONFIGURATION   *****************
        **********************************************************************
 
-       ?? REPLACE THE TEXT "ADD LOGO URL HERE" BELOW WITH YOUR FULL IMAGE URL.
+       REPLACE THE TEXT "ADD LOGO URL HERE" BELOW WITH YOUR FULL IMAGE URL.
 
        - The logo will appear on ALL versions of the printout:
          PHYSICAL + DIGITAL (Article + Book/Chapter)
@@ -25,7 +25,7 @@
        Lock logo width proportionally:
        - Enforced via max-height/max-width + height:auto + width:auto
 
-       Or add a “No Logo Configured” invisible safeguard comment for debugging:
+       Or add a "No Logo Configured" invisible safeguard comment for debugging:
        - Included below (as an HTML comment) if no URL is configured.
 
        **********************************************************************
@@ -125,10 +125,10 @@
     </xsl:if>
 
     <xsl:if test="$logo != '' and $logo != 'ADD LOGO URL HERE'">
-      <table border="0" cellspacing="0" cellpadding="0" align="center" style="margin:0 auto;">
+      <table border="0" cellspacing="0" cellpadding="0" style="width:100%; margin:0; border-collapse:collapse;">
         <tr><td height="12">&#160;</td></tr>
         <tr>
-          <td align="center">
+          <td align="center" style="text-align:center; width:100%;">
             <img src="{$logo}" alt="Library Logo" style="display:block; margin:0 auto; max-height:100px;" />
           </td>
         </tr>
@@ -141,13 +141,13 @@
 
 
   <!-- =====================================================================
-       SECTION 01 — ROOT TEMPLATE (match="/")
+       SECTION 01 - ROOT TEMPLATE (match="/")
        NOTE: Everything below is intended to be modular for swapping.
        ===================================================================== -->
   <xsl:template match="/">
 
     <!-- ===================================================================
-         SECTION 02 — HTML DOCUMENT ROOT
+         SECTION 02 - HTML DOCUMENT ROOT
          =================================================================== -->
     <html>
       <xsl:if test="notification_data/languages/string">
@@ -157,7 +157,7 @@
       </xsl:if>
 
       <!-- ================================================================
-           SECTION 03 — HEAD (TITLE + PRINT CSS)
+           SECTION 03 - HEAD (TITLE + PRINT CSS)
            NOTE: The CSS below enforces "single page" behavior by hard-locking
                  the printable viewport. Content that exceeds height will CLIP.
            ================================================================ -->
@@ -165,7 +165,7 @@
         <title><xsl:value-of select="notification_data/general_data/subject" /></title>
 
         <!-- ================================================================
-             SECTION 03A — PRINT CSS (100% SINGLE-PAGE "PARANOID" MODE)
+             SECTION 03A - PRINT CSS (100% SINGLE-PAGE "PARANOID" MODE)
              ================================================================ -->
         <style type="text/css" media="print">
           @page { size: 3.75in 11in; margin: 0.20in; }
@@ -267,40 +267,40 @@
 
           .rsSlip br { line-height: 0.55 !important; }
         </style>
-        <!-- ===== END SECTION 03A — PRINT CSS ===== -->
+        <!-- ===== END SECTION 03A - PRINT CSS ===== -->
       </head>
-      <!-- ===== END SECTION 03 — HEAD ===== -->
+      <!-- ===== END SECTION 03 - HEAD ===== -->
 
 
       <!-- ================================================================
-           SECTION 04 — BODY ROOT
+           SECTION 04 - BODY ROOT
            NOTE: Contains outer border wrapper and scaled inner content.
            ================================================================ -->
       <body>
 
         <!-- ================================================================
-             SECTION 05 — OUTER BORDER WRAPPER (NOT SCALED)
+             SECTION 05 - OUTER BORDER WRAPPER (NOT SCALED)
              ================================================================ -->
         <div class="rsSlipOuter">
 
           <!-- ==============================================================
-               SECTION 06 — INNER SCALED CONTENT WRAPPER
+               SECTION 06 - INNER SCALED CONTENT WRAPPER
                NOTE: This is scaled with transform; border remains full size.
                ============================================================= -->
           <div class="rsSlip rsSlipInner">
 
             <!-- ============================================================
-                 SECTION 07 — MESSAGE CONTAINERS
+                 SECTION 07 - MESSAGE CONTAINERS
                  ============================================================ -->
             <div class="messageArea">
               <div class="messageBody">
 
                 <!-- ============================================================
-                     SECTION 08 — HEADER BLOCK (PARTNER + POD + LOGO)
+                     SECTION 08 - HEADER BLOCK (PARTNER + POD + LOGO)
                      SWAP TARGET: Replace the entire SECTION 08 block to change
                      partner/pod presentation or alternate logo behavior.
                      ============================================================ -->
-                <!-- ===== BEGIN SECTION 08 — PARTNER/POD/LOGO ===== -->
+                <!-- ===== BEGIN SECTION 08 - PARTNER/POD/LOGO ===== -->
                 <table border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td style="font-size:14pt">
@@ -332,21 +332,21 @@
 
                 <!-- Logo for all printouts -->
                 <xsl:call-template name="print-library-logo" />
-                <!-- ===== END SECTION 08 — PARTNER/POD/LOGO ===== -->
+                <!-- ===== END SECTION 08 - PARTNER/POD/LOGO ===== -->
 
 
                 <!-- ============================================================
-                     SECTION 09 — MAIN CONTENT TABLE WRAPPER
+                     SECTION 09 - MAIN CONTENT TABLE WRAPPER
                      NOTE: Contains PHYSICAL and DIGITAL conditional blocks.
                      ============================================================ -->
-                <!-- ===== BEGIN SECTION 09 — MAIN CONTENT TABLE ===== -->
+                <!-- ===== BEGIN SECTION 09 - MAIN CONTENT TABLE ===== -->
                 <table role="presentation" cellspacing="0" cellpadding="5" border="0">
 
                   <!-- ==========================================================
-                       SECTION 10 — PHYSICAL BLOCK (RS SLIP + SHIPPING LABEL)
+                       SECTION 10 - PHYSICAL BLOCK (RS SLIP + SHIPPING LABEL)
                        SWAP TARGET: Replace entire SECTION 10 block if needed.
                        ========================================================== -->
-                  <!-- ===== BEGIN SECTION 10 — PHYSICAL ===== -->
+                  <!-- ===== BEGIN SECTION 10 - PHYSICAL ===== -->
                   <xsl:if test="notification_data/incoming_request/format = 'PHYSICAL'">
 
                     <xsl:variable name="availItem"
@@ -381,7 +381,7 @@
                     </xsl:if>
 
                     <!-- ==========================================================
-                         SECTION 10A — EMPHASIS BOX (LOCATION + CALL NUMBER)
+                         SECTION 10A - EMPHASIS BOX (LOCATION + CALL NUMBER)
                          ========================================================== -->
                     <tr>
                       <td>
@@ -405,7 +405,7 @@
                         </div>
                       </td>
                     </tr>
-                    <!-- ===== END SECTION 10A — EMPHASIS BOX ===== -->
+                    <!-- ===== END SECTION 10A - EMPHASIS BOX ===== -->
 
                     <xsl:call-template name="spacer" />
 
@@ -422,7 +422,7 @@
 
                     <tr><td><b>Note:__________________________</b></td></tr>
                     <!-- ==========================================================
-                         SECTION 10B — SHIPPING LABEL
+                         SECTION 10B - SHIPPING LABEL
                          NOTE: Use this section if the respondent says they want a shipping label
                          ========================================================== -->
                     <table class="shippingLabel" cellspacing="0" cellpadding="0" border="1">
@@ -449,7 +449,7 @@
                           <font size="2">Return To: </font>
                           <br /><br />
 
-                          <!-- FULL ADDRESS — NEVER TRUNCATE -->
+                          <!-- FULL ADDRESS - NEVER TRUNCATE -->
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address1" /></b></center>
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address2" /></b></center>
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address3" /></b></center>
@@ -481,7 +481,7 @@
                                   <xsl:call-template name="listStyleCss" />
                                 </xsl:attribute>
 
-                                <!-- FULL ADDRESS — NEVER TRUNCATE -->
+                                <!-- FULL ADDRESS - NEVER TRUNCATE -->
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line1" /></b></center></td></tr>
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line2" /></b></center></td></tr>
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line3" /></b></center></td></tr>
@@ -493,7 +493,7 @@
                             </xsl:when>
 
                             <xsl:otherwise>
-                              <!-- FULL ADDRESS — NEVER TRUNCATE -->
+                              <!-- FULL ADDRESS - NEVER TRUNCATE -->
                               <center><b><xsl:value-of select="notification_data/partner_name" /></b></center>
                               <center><b><xsl:value-of select="notification_data/borrowing_library_address/line1" /></b></center>
                               <center><b><xsl:value-of select="notification_data/borrowing_library_address/line2" /></b></center>
@@ -516,9 +516,9 @@
                         </td>
                       </tr>
                     </table>
-                    <!-- ===== END SECTION 10B — SHIPPING LABEL ===== -->			
+                    <!-- ===== END SECTION 10B - SHIPPING LABEL ===== -->			
                     <!-- ==========================================================
-                         SECTION 10B — SHIPPING LABEL (SWAPPED ADDRESSES)
+                         SECTION 10B - SHIPPING LABEL (SWAPPED ADDRESSES)
                          NOTE: Use this if the respondent says they want a return label
                          ========================================================== -->
                     <table class="shippingLabel" cellspacing="0" cellpadding="0" border="1">
@@ -556,7 +556,7 @@
                                   <xsl:call-template name="listStyleCss" />
                                 </xsl:attribute>
 
-                                <!-- FULL ADDRESS — NEVER TRUNCATE -->
+                                <!-- FULL ADDRESS - NEVER TRUNCATE -->
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line1" /></b></center></td></tr>
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line2" /></b></center></td></tr>
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line3" /></b></center></td></tr>
@@ -568,7 +568,7 @@
                             </xsl:when>
 
                             <xsl:otherwise>
-                              <!-- FULL ADDRESS — NEVER TRUNCATE -->
+                              <!-- FULL ADDRESS - NEVER TRUNCATE -->
                               <center><b><xsl:value-of select="notification_data/partner_name" /></b></center>
                               <center><b><xsl:value-of select="notification_data/borrowing_library_address/line1" /></b></center>
                               <center><b><xsl:value-of select="notification_data/borrowing_library_address/line2" /></b></center>
@@ -601,7 +601,7 @@
                           <font size="2">Ship To: </font>
                           <br /><br />
 
-                          <!-- FULL ADDRESS — NEVER TRUNCATE -->
+                          <!-- FULL ADDRESS - NEVER TRUNCATE -->
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address1" /></b></center>
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address2" /></b></center>
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address3" /></b></center>
@@ -622,20 +622,20 @@
                       </tr>
 
                     </table>
-                    <!-- ===== END SECTION 10B — SHIPPING LABEL (SWAPPED) ===== -->					
+                    <!-- ===== END SECTION 10B - SHIPPING LABEL (SWAPPED) ===== -->					
                   </xsl:if>
-                  <!-- ===== END SECTION 10 — PHYSICAL ===== -->
+                  <!-- ===== END SECTION 10 - PHYSICAL ===== -->
 
 
                   <!-- ==========================================================
-                       SECTION 11 — DIGITAL WRAPPER
+                       SECTION 11 - DIGITAL WRAPPER
                        NOTE: Contains DIGITAL ARTICLE and DIGITAL BOOK blocks.
                        ========================================================== -->
-                  <!-- ===== BEGIN SECTION 11 — DIGITAL ===== -->
+                  <!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->
                   <xsl:if test="notification_data/incoming_request/format = 'DIGITAL'">
 
                     <!-- ========================================================
-                         SECTION 11A — DIGITAL ARTICLE
+                         SECTION 11A - DIGITAL ARTICLE
                          ======================================================== -->
                     <xsl:if test="notification_data/metadata/material_type = 'Article'">
 
@@ -731,11 +731,11 @@
 
                       <tr><td><img src="cid:resource_sharing_request_id.png" /></td></tr>
                     </xsl:if>
-                    <!-- ===== END SECTION 11A — DIGITAL ARTICLE ===== -->
+                    <!-- ===== END SECTION 11A - DIGITAL ARTICLE ===== -->
 
 
                     <!-- ========================================================
-                         SECTION 11B — DIGITAL BOOK/CHAPTER
+                         SECTION 11B - DIGITAL BOOK/CHAPTER
                          ======================================================== -->
                     <xsl:if test="notification_data/metadata/material_type = 'Book'">
 
@@ -841,11 +841,11 @@
 
                       <tr><td><img src="cid:resource_sharing_request_id.png" /></td></tr>
                     </xsl:if>
-                    <!-- ===== END SECTION 11B — DIGITAL BOOK/CHAPTER ===== -->
+                    <!-- ===== END SECTION 11B - DIGITAL BOOK/CHAPTER ===== -->
 
 
                     <!-- ========================================================
-                         SECTION 11C — COPYRIGHT NOTICE
+                         SECTION 11C - COPYRIGHT NOTICE
                          ======================================================== -->
                     <xsl:call-template name="spacer" />
                     <tr>
@@ -859,13 +859,13 @@
                         </font>
                       </td>
                     </tr>
-                    <!-- ===== END SECTION 11C — COPYRIGHT NOTICE ===== -->
+                    <!-- ===== END SECTION 11C - COPYRIGHT NOTICE ===== -->
 
                   </xsl:if>
-                  <!-- ===== END SECTION 11 — DIGITAL ===== -->
+                  <!-- ===== END SECTION 11 - DIGITAL ===== -->
 
                 </table>
-                <!-- ===== END SECTION 09 — MAIN CONTENT TABLE ===== -->
+                <!-- ===== END SECTION 09 - MAIN CONTENT TABLE ===== -->
 
               </div>
             </div>
@@ -876,6 +876,8 @@
     </html>
 
   </xsl:template>
-  <!-- ===== END: SECTION 01 — ROOT TEMPLATE (match="/") ===== -->
+  <!-- ===== END: SECTION 01 - ROOT TEMPLATE (match="/") ===== -->
 
 </xsl:stylesheet>					
+
+
