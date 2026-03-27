@@ -11,6 +11,7 @@ Instead of editing raw XSL by hand, staff can answer a short form, preview the g
 - Shows a live preview.
 - Replaces placeholders like `@@LOGO_URL@@` with survey answers.
 - Supports letter-specific follow-up questions that appear only when needed.
+- Only shows letter choices that currently have implemented XSL behind them.
 - Runs a minimal GitHub Actions validation workflow on pushes and pull requests.
 
 ## Project files
