@@ -17,13 +17,13 @@
       <form class="panel form-panel" id="builder-form">
         <div class="panel-heading">
           <h2>Questions</h2>
-          <p>These first questions define the library and the letter you want to customize.</p>
+          <p>Fill out this form to customize your XSL. After generating it, scroll down to copy the code and view an online preview of the letter in Alma.</p>
         </div>
 
         <div class="field-grid">
           <label class="field">
             <span>Library Name</span>
-            <input type="text" name="libraryName" value="My Library">
+            <input type="text" name="libraryName" value="">
           </label>
 
           <label class="field field-wide">
@@ -37,7 +37,37 @@
 
         <div class="field-grid" id="letter-specific-questions" hidden>
           <label class="field field-wide" data-letter-question="pull-slip-letter">
+            <span>Do you want the request creation date added to your slip?</span>
+            <select name="includeCreateDate">
+              <option value="" selected>Select an option</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
+
+          <label class="field field-wide" data-letter-question="pull-slip-letter" data-dependent-question="includeCreateDate" data-dependent-value="yes">
+            <span>What format do you want the date to appear?</span>
+            <select name="createDateFormat">
+              <option value="" selected>Select an option</option>
+              <option value="numerical">Numerical Format (USA)</option>
+              <option value="numerical-europe">Numerical Format (Europe)</option>
+              <option value="readable">Readable Format (USA)</option>
+              <option value="readable-europe">Readable Format (Europe)</option>
+            </select>
+          </label>
+
+          <label class="field field-wide" data-letter-question="pull-slip-letter">
+            <span>Do you want to add your library logo to the Letter?</span>
+            <select name="includeLogo">
+              <option value="" selected>Select an option</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
+
+          <label class="field field-wide" data-letter-question="pull-slip-letter" data-dependent-question="includeLogo" data-dependent-value="yes">
             <span>What is the URL for the logo you want printed on the slip?</span>
+            <small>The URL must link directly to a PNG or JPEG image.</small>
             <input
               type="url"
               name="logoUrl"
@@ -46,42 +76,28 @@
           </label>
 
           <label class="field field-wide" data-letter-question="pull-slip-letter">
-            <span>Do you want a Shipping Label, Return Label, or No Label on the slip?</span>
-            <select name="labelChoice">
-              <option value="shipping-label" selected>Shipping Label to mail the item to the Borrowing Library</option>
-              <option value="return-label">Return Label for the Borrowing Library to use to return the item</option>
-              <option value="no-label">No Label</option>
-            </select>
-          </label>
-
-          <label class="field field-wide" data-letter-question="pull-slip-letter">
-            <span>Do you want the request creation date added to your slip?</span>
-            <select name="includeCreateDate">
-              <option value="yes" selected>Yes</option>
-              <option value="no">No</option>
-            </select>
-          </label>
-
-          <label class="field field-wide" data-letter-question="pull-slip-letter" data-dependent-question="includeCreateDate" data-dependent-value="yes">
-            <span>What format do you want the date to appear?</span>
-            <select name="createDateFormat">
-              <option value="numerical" selected>Numerical Format (Example: 03/25/2026)</option>
-              <option value="readable">Readable Format (Example: March 25, 2026)</option>
-            </select>
-          </label>
-
-          <label class="field field-wide" data-letter-question="pull-slip-letter">
-            <span>Do you want a space to communicate issues or pre-existing damage to the Borrowing Library? What format?</span>
+            <span>Do you want an area on the printed letter to communicate issues or pre-existing damage to the Borrowing Library? What format?</span>
             <select name="noteAreaType">
-              <option value="none" selected>No note area</option>
+              <option value="" selected>Select an option</option>
+              <option value="none">No note area</option>
               <option value="line">A line dedicated to writing a short note</option>
               <option value="checkboxes">A series of check boxes explaining the issues</option>
+            </select>
+          </label>
+
+          <label class="field field-wide" data-letter-question="pull-slip-letter">
+            <span>Do you want a Shipping Label, Return Label, or No Label on the slip?</span>
+            <select name="labelChoice">
+              <option value="" selected>Select an option</option>
+              <option value="shipping-label">Shipping Label to mail the item to the Borrowing Library</option>
+              <option value="return-label">Return Label for the Borrowing Library to use to return the item</option>
+              <option value="no-label">No Label</option>
             </select>
           </label>
         </div>
 
         <div class="actions">
-          <button type="submit" class="button primary">Generate XSL</button>
+          <button type="submit" class="button primary" id="submit-button">Submit</button>
           <button type="reset" class="button secondary" id="reset-button">Reset</button>
         </div>
       </form>
@@ -91,13 +107,17 @@
       <div class="panel-heading">
         <h2>Generated XSL</h2>
         <p>Select all the below code, copy it, and paste it into the appropriate Letter in Alma.</p>
+        <button type="button" class="button primary copy-button" id="copy-xsl-button">
+          <span class="copy-icon" aria-hidden="true"></span>
+          <span class="copy-button-label">Copy</span>
+        </button>
       </div>
       <pre id="xsl-preview"></pre>
     </section>
 
     <section class="panel rendered-panel">
       <div class="panel-heading">
-        <h2>Rendered Preview</h2>
+        <h2>Preview</h2>
         <p>This shows what the generated XSL produces when run against the sample XML.</p>
       </div>
       <div id="rendered-preview"></div>

@@ -12,28 +12,7 @@
   <xsl:include href="style.xsl" />
   <xsl:include href="recordTitle.xsl" />
 
-  <!-- **********************************************************************
-       **********************************************************************
-       *********************   LIBRARY LOGO CONFIGURATION   *****************
-       **********************************************************************
-
-       REPLACE THE TEXT "ADD LOGO URL HERE" BELOW WITH YOUR FULL IMAGE URL.
-
-       - The logo will appear on ALL versions of the printout:
-         PHYSICAL + DIGITAL (Article + Book/Chapter)
-
-       Lock logo width proportionally:
-       - Enforced via max-height/max-width + height:auto + width:auto
-
-       Or add a "No Logo Configured" invisible safeguard comment for debugging:
-       - Included below (as an HTML comment) if no URL is configured.
-
-       **********************************************************************
-       ********************************************************************** -->
   <xsl:variable name="LIBRARY_LOGO_URL">@@LOGO_URL@@</xsl:variable>
-  <!-- **********************************************************************
-       *********************   END LIBRARY LOGO CONFIGURATION   *************
-       ********************************************************************** -->
 
   <!-- SECTION: Utility Spacing -->
   <xsl:template name="spacer">
@@ -121,7 +100,9 @@
     <xsl:variable name="logo" select="normalize-space($LIBRARY_LOGO_URL)" />
 
     <xsl:if test="$logo = '' or $logo = 'ADD LOGO URL HERE'">
-      <xsl:comment> NO LOGO CONFIGURED: Replace 'ADD LOGO URL HERE' in the LIBRARY LOGO CONFIGURATION section near the top of this XSL. </xsl:comment>
+      <table border="0" cellspacing="0" cellpadding="0" style="width:350px; max-width:350px; margin:0; border-collapse:collapse;">
+        <tr><td height="24">&#160;</td></tr>
+      </table>
     </xsl:if>
 
     <xsl:if test="$logo != '' and $logo != 'ADD LOGO URL HERE'">
@@ -129,7 +110,7 @@
         <tr><td height="12">&#160;</td></tr>
         <tr>
           <td align="center" style="text-align:center; width:350px;">
-            <img src="{$logo}" alt="Library Logo" style="display:block; margin:0 auto; max-height:100px;" />
+            <img src="{$logo}" alt="Library Logo" style="display:block; margin:0 auto; height:100px; width:auto; max-width:350px;" />
           </td>
         </tr>
         <tr><td height="12">&#160;</td></tr>
@@ -140,28 +121,124 @@
   <xsl:template name="format-create-date">
     <xsl:param name="date" />
     <xsl:param name="format" select="'numerical'" />
+    <xsl:param name="language" select="normalize-space(notification_data/languages/string)" />
     <xsl:choose>
-      <xsl:when test="$format = 'readable' and string-length(normalize-space($date)) = 10">
+      <xsl:when test="$format = 'numerical-europe' and string-length(normalize-space($date)) = 10">
+        <xsl:value-of select="substring($date, 4, 2)" />
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="substring($date, 1, 2)" />
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="substring($date, 7, 4)" />
+      </xsl:when>
+      <xsl:when test="($format = 'readable' or $format = 'readable-europe') and string-length(normalize-space($date)) = 10">
         <xsl:variable name="month" select="substring($date, 1, 2)" />
         <xsl:variable name="day" select="substring($date, 4, 2)" />
         <xsl:variable name="year" select="substring($date, 7, 4)" />
+        <xsl:variable name="lang">
+          <xsl:choose>
+            <xsl:when test="starts-with($language, 'fr')">fr</xsl:when>
+            <xsl:when test="starts-with($language, 'es')">es</xsl:when>
+            <xsl:when test="starts-with($language, 'de')">de</xsl:when>
+            <xsl:when test="starts-with($language, 'it')">it</xsl:when>
+            <xsl:otherwise>en</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:if test="$format = 'readable-europe'">
+          <xsl:value-of select="number($day)" />
+          <xsl:text> </xsl:text>
+        </xsl:if>
         <xsl:choose>
-          <xsl:when test="$month = '01'">January</xsl:when>
-          <xsl:when test="$month = '02'">February</xsl:when>
-          <xsl:when test="$month = '03'">March</xsl:when>
-          <xsl:when test="$month = '04'">April</xsl:when>
-          <xsl:when test="$month = '05'">May</xsl:when>
-          <xsl:when test="$month = '06'">June</xsl:when>
-          <xsl:when test="$month = '07'">July</xsl:when>
-          <xsl:when test="$month = '08'">August</xsl:when>
-          <xsl:when test="$month = '09'">September</xsl:when>
-          <xsl:when test="$month = '10'">October</xsl:when>
-          <xsl:when test="$month = '11'">November</xsl:when>
-          <xsl:when test="$month = '12'">December</xsl:when>
+          <xsl:when test="$lang = 'fr'">
+            <xsl:choose>
+              <xsl:when test="$month = '01'">janvier</xsl:when>
+              <xsl:when test="$month = '02'">fevrier</xsl:when>
+              <xsl:when test="$month = '03'">mars</xsl:when>
+              <xsl:when test="$month = '04'">avril</xsl:when>
+              <xsl:when test="$month = '05'">mai</xsl:when>
+              <xsl:when test="$month = '06'">juin</xsl:when>
+              <xsl:when test="$month = '07'">juillet</xsl:when>
+              <xsl:when test="$month = '08'">aout</xsl:when>
+              <xsl:when test="$month = '09'">septembre</xsl:when>
+              <xsl:when test="$month = '10'">octobre</xsl:when>
+              <xsl:when test="$month = '11'">novembre</xsl:when>
+              <xsl:when test="$month = '12'">decembre</xsl:when>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:when test="$lang = 'es'">
+            <xsl:choose>
+              <xsl:when test="$month = '01'">enero</xsl:when>
+              <xsl:when test="$month = '02'">febrero</xsl:when>
+              <xsl:when test="$month = '03'">marzo</xsl:when>
+              <xsl:when test="$month = '04'">abril</xsl:when>
+              <xsl:when test="$month = '05'">mayo</xsl:when>
+              <xsl:when test="$month = '06'">junio</xsl:when>
+              <xsl:when test="$month = '07'">julio</xsl:when>
+              <xsl:when test="$month = '08'">agosto</xsl:when>
+              <xsl:when test="$month = '09'">septiembre</xsl:when>
+              <xsl:when test="$month = '10'">octubre</xsl:when>
+              <xsl:when test="$month = '11'">noviembre</xsl:when>
+              <xsl:when test="$month = '12'">diciembre</xsl:when>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:when test="$lang = 'de'">
+            <xsl:choose>
+              <xsl:when test="$month = '01'">Januar</xsl:when>
+              <xsl:when test="$month = '02'">Februar</xsl:when>
+              <xsl:when test="$month = '03'">Marz</xsl:when>
+              <xsl:when test="$month = '04'">April</xsl:when>
+              <xsl:when test="$month = '05'">Mai</xsl:when>
+              <xsl:when test="$month = '06'">Juni</xsl:when>
+              <xsl:when test="$month = '07'">Juli</xsl:when>
+              <xsl:when test="$month = '08'">August</xsl:when>
+              <xsl:when test="$month = '09'">September</xsl:when>
+              <xsl:when test="$month = '10'">Oktober</xsl:when>
+              <xsl:when test="$month = '11'">November</xsl:when>
+              <xsl:when test="$month = '12'">Dezember</xsl:when>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:when test="$lang = 'it'">
+            <xsl:choose>
+              <xsl:when test="$month = '01'">gennaio</xsl:when>
+              <xsl:when test="$month = '02'">febbraio</xsl:when>
+              <xsl:when test="$month = '03'">marzo</xsl:when>
+              <xsl:when test="$month = '04'">aprile</xsl:when>
+              <xsl:when test="$month = '05'">maggio</xsl:when>
+              <xsl:when test="$month = '06'">giugno</xsl:when>
+              <xsl:when test="$month = '07'">luglio</xsl:when>
+              <xsl:when test="$month = '08'">agosto</xsl:when>
+              <xsl:when test="$month = '09'">settembre</xsl:when>
+              <xsl:when test="$month = '10'">ottobre</xsl:when>
+              <xsl:when test="$month = '11'">novembre</xsl:when>
+              <xsl:when test="$month = '12'">dicembre</xsl:when>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:choose>
+              <xsl:when test="$month = '01'">January</xsl:when>
+              <xsl:when test="$month = '02'">February</xsl:when>
+              <xsl:when test="$month = '03'">March</xsl:when>
+              <xsl:when test="$month = '04'">April</xsl:when>
+              <xsl:when test="$month = '05'">May</xsl:when>
+              <xsl:when test="$month = '06'">June</xsl:when>
+              <xsl:when test="$month = '07'">July</xsl:when>
+              <xsl:when test="$month = '08'">August</xsl:when>
+              <xsl:when test="$month = '09'">September</xsl:when>
+              <xsl:when test="$month = '10'">October</xsl:when>
+              <xsl:when test="$month = '11'">November</xsl:when>
+              <xsl:when test="$month = '12'">December</xsl:when>
+            </xsl:choose>
+          </xsl:otherwise>
         </xsl:choose>
-        <xsl:text> </xsl:text>
-        <xsl:value-of select="number($day)" />
-        <xsl:text>, </xsl:text>
+        <xsl:choose>
+          <xsl:when test="$format = 'readable-europe'">
+            <xsl:text> </xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text> </xsl:text>
+            <xsl:value-of select="number($day)" />
+            <xsl:text>, </xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
         <xsl:value-of select="$year" />
       </xsl:when>
       <xsl:otherwise>
@@ -334,9 +411,9 @@
                      partner/pod presentation or alternate logo behavior.
                      ============================================================ -->
                 <!-- ===== BEGIN SECTION 08 - PARTNER/POD/LOGO ===== -->
-                <table border="0" cellspacing="0" cellpadding="0">
+                <table border="0" cellspacing="0" cellpadding="0" style="width:350px; max-width:350px; table-layout:fixed;">
                   <tr>
-                    <td style="font-size:14pt">
+                    <td style="font-size:14pt; width:350px;">
                       <strong>
                         <xsl:call-template name="truncate-text">
                           <xsl:with-param name="text" select="normalize-space(notification_data/partner_name)" />
@@ -348,7 +425,7 @@
 
                   <xsl:if test="normalize-space(notification_data/pod_name) != ''">
                     <tr>
-                      <td>
+                      <td style="width:350px;">
                         <b>Pod:&#160;</b>
                         <xsl:call-template name="truncate-text">
                           <xsl:with-param name="text" select="normalize-space(notification_data/pod_name)" />
@@ -359,13 +436,13 @@
                   </xsl:if>
 
                   <xsl:if test="notification_data/partner_code = 'RapidILL'">
-                    <tr><td><b>Pod:&#160;RapidR</b></td></tr>
+                    <tr><td style="width:350px;"><b>Pod:&#160;RapidR</b></td></tr>
                   </xsl:if>
 
                   <!-- BEGIN OPTIONAL CREATE DATE -->
                   <xsl:if test="normalize-space(notification_data/incoming_request/create_date) != ''">
                     <tr>
-                      <td>
+                      <td style="width:350px;">
                         <b>Date:&#160;</b>
                         <xsl:call-template name="format-create-date">
                           <xsl:with-param name="date" select="notification_data/incoming_request/create_date" />
@@ -387,7 +464,7 @@
                      NOTE: Contains PHYSICAL and DIGITAL conditional blocks.
                      ============================================================ -->
                 <!-- ===== BEGIN SECTION 09 - MAIN CONTENT TABLE ===== -->
-                <table role="presentation" cellspacing="0" cellpadding="2" border="0">
+                <table role="presentation" cellspacing="0" cellpadding="2" border="0" style="width:350px; max-width:350px; table-layout:fixed;">
 
                   <!-- ==========================================================
                        SECTION 10 - PHYSICAL BLOCK (RS SLIP + SHIPPING LABEL)
@@ -400,7 +477,7 @@
                       select="notification_data/items/physical_item_display_for_printing/available_items/available_item" />
 
                     <tr>
-                      <td>
+                      <td style="width:350px;">
                         <b>Title:&#160;</b>
                         <xsl:call-template name="truncate-text">
                           <xsl:with-param name="text" select="normalize-space(notification_data/metadata/title)" />
@@ -411,7 +488,7 @@
 
                     <xsl:if test="normalize-space(notification_data/metadata/author) != ''">
                       <tr>
-                        <td>
+                        <td style="width:350px;">
                           <b>Author:&#160;</b>
                           <xsl:call-template name="truncate-text">
                             <xsl:with-param name="text" select="normalize-space(notification_data/metadata/author)" />
@@ -423,7 +500,7 @@
 
                     <xsl:if test="normalize-space(notification_data/metadata/volume) != ''">
                       <tr>
-                        <td><b>@@volume@@:&#160;</b><xsl:value-of select="notification_data/metadata/volume" /></td>
+                        <td style="width:350px;"><b>@@volume@@:&#160;</b><xsl:value-of select="notification_data/metadata/volume" /></td>
                       </tr>
                     </xsl:if>
 
@@ -431,10 +508,10 @@
                          SECTION 10A - EMPHASIS BOX (LOCATION + CALL NUMBER)
                          ========================================================== -->
                     <tr>
-                      <td>
+                      <td style="width:350px;">
                         <div class="emphBox" style="border:2px solid #000; padding:6px;">
                           <div>
-                            <b>@@location@@:&#160;</b>
+                            <b>Location:&#160;</b>
                             <span class="locCallValue">
                               <xsl:call-template name="pick-location">
                                 <xsl:with-param name="avail" select="$availItem" />
@@ -442,7 +519,7 @@
                             </span>
                           </div>
                           <div>
-                            <b>@@call_number@@:&#160;</b>
+                            <b>Call Number:&#160;</b>
                             <b class="locCallValue">
                               <xsl:call-template name="pick-call-number">
                                 <xsl:with-param name="avail" select="$availItem" />
@@ -457,13 +534,13 @@
                     <xsl:call-template name="spacer" />
 
                     <xsl:if test="normalize-space(notification_data/group_qualifier) != ''">
-                      <tr><td><img src="cid:group_qualifier.png" alt="group_qualifier" /></td></tr>
+                      <tr><td style="width:350px;"><img src="cid:group_qualifier.png" alt="group_qualifier" /></td></tr>
                     </xsl:if>
 
                     <xsl:call-template name="spacer" />
 
                     <xsl:if test="normalize-space(notification_data/renewals_allowed) = 'false'">
-                      <tr><td style="font-size:20px">NO RENEWALS</td></tr>
+                      <tr><td style="font-size:20px; width:350px;">NO RENEWALS</td></tr>
                       <xsl:call-template name="spacer" />
                     </xsl:if>
 
@@ -477,20 +554,20 @@
                     <xsl:call-template name="spacer" />
                     <!-- END OPTIONAL NOTE AREA -->
                     <!-- ==========================================================
-                         SECTION 10B - SHIPPING LABEL
-                         NOTE: Use this section if the respondent says they want a shipping label
+                         SECTION 10B — SHIPPING LABEL
+                         NOTE: Addresses MUST remain full; do not truncate.
                          ========================================================== -->
                     <table class="shippingLabel" cellspacing="0" cellpadding="0" border="1">
                       <tr>
                         <tr>
-                          <td>
-                            <b>@@Title@@: </b>
+                          <td style="font-size:12px;">
+                            <b>Title: </b>
                             <xsl:call-template name="truncate-text">
                               <xsl:with-param name="text" select="normalize-space(notification_data/metadata/title)" />
                               <xsl:with-param name="max" select="80" />
                             </xsl:call-template>
                             <br />
-                            <b>@@external_identifier@@: </b>
+                            <b>External ID: </b>
                             <xsl:call-template name="truncate-text">
                               <xsl:with-param name="text" select="normalize-space(notification_data/group_qualifier)" />
                               <xsl:with-param name="max" select="60" />
@@ -504,7 +581,7 @@
                           <font size="2">Return To: </font>
                           <br /><br />
 
-                          <!-- FULL ADDRESS - NEVER TRUNCATE -->
+                          <!-- FULL ADDRESS — NEVER TRUNCATE -->
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address1" /></b></center>
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address2" /></b></center>
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address3" /></b></center>
@@ -536,7 +613,7 @@
                                   <xsl:call-template name="listStyleCss" />
                                 </xsl:attribute>
 
-                                <!-- FULL ADDRESS - NEVER TRUNCATE -->
+                                <!-- FULL ADDRESS — NEVER TRUNCATE -->
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line1" /></b></center></td></tr>
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line2" /></b></center></td></tr>
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line3" /></b></center></td></tr>
@@ -548,7 +625,7 @@
                             </xsl:when>
 
                             <xsl:otherwise>
-                              <!-- FULL ADDRESS - NEVER TRUNCATE -->
+                              <!-- FULL ADDRESS — NEVER TRUNCATE -->
                               <center><b><xsl:value-of select="notification_data/partner_name" /></b></center>
                               <center><b><xsl:value-of select="notification_data/borrowing_library_address/line1" /></b></center>
                               <center><b><xsl:value-of select="notification_data/borrowing_library_address/line2" /></b></center>
@@ -571,22 +648,21 @@
                         </td>
                       </tr>
                     </table>
-                    <!-- ===== END SECTION 10B - SHIPPING LABEL ===== -->			
+                    <!-- ===== END SECTION 10B — SHIPPING LABEL ===== -->			
                     <!-- ==========================================================
-                         SECTION 10B - SHIPPING LABEL (SWAPPED ADDRESSES)
-                         NOTE: Use this if the respondent says they want a return label
+                         SECTION 10B — Return LABEL 
                          ========================================================== -->
                     <table class="shippingLabel" cellspacing="0" cellpadding="0" border="1">
                       <tr>
                         <tr>
-                          <td>
-                            <b>@@Title@@: </b>
+                          <td style="font-size:12px;">
+                            <b>Title: </b>
                             <xsl:call-template name="truncate-text">
                               <xsl:with-param name="text" select="normalize-space(notification_data/metadata/title)" />
                               <xsl:with-param name="max" select="80" />
                             </xsl:call-template>
                             <br />
-                            <b>@@external_identifier@@: </b>
+                            <b>External ID: </b>
                             <xsl:call-template name="truncate-text">
                               <xsl:with-param name="text" select="normalize-space(notification_data/group_qualifier)" />
                               <xsl:with-param name="max" select="60" />
@@ -611,7 +687,7 @@
                                   <xsl:call-template name="listStyleCss" />
                                 </xsl:attribute>
 
-                                <!-- FULL ADDRESS - NEVER TRUNCATE -->
+                                <!-- FULL ADDRESS — NEVER TRUNCATE -->
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line1" /></b></center></td></tr>
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line2" /></b></center></td></tr>
                                 <tr><td style="font-size:16px;width:350px"><center><b><xsl:value-of select="notification_data/borrowing_library_address/line3" /></b></center></td></tr>
@@ -623,7 +699,7 @@
                             </xsl:when>
 
                             <xsl:otherwise>
-                              <!-- FULL ADDRESS - NEVER TRUNCATE -->
+                              <!-- FULL ADDRESS — NEVER TRUNCATE -->
                               <center><b><xsl:value-of select="notification_data/partner_name" /></b></center>
                               <center><b><xsl:value-of select="notification_data/borrowing_library_address/line1" /></b></center>
                               <center><b><xsl:value-of select="notification_data/borrowing_library_address/line2" /></b></center>
@@ -656,7 +732,7 @@
                           <font size="2">Ship To: </font>
                           <br /><br />
 
-                          <!-- FULL ADDRESS - NEVER TRUNCATE -->
+                          <!-- FULL ADDRESS — NEVER TRUNCATE -->
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address1" /></b></center>
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address2" /></b></center>
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address3" /></b></center>
@@ -758,7 +834,7 @@
                         <td>
                           <div class="emphBox" style="border:2px solid #000; padding:6px;">
                             <div>
-                              <b>@@location@@:&#160;</b>
+                              <b>Location:&#160;</b>
                               <span class="locCallValue">
                                 <xsl:call-template name="pick-location">
                                   <xsl:with-param name="avail" select="notification_data/items/physical_item_display_for_printing/available_items/available_item" />
@@ -766,7 +842,7 @@
                               </span>
                             </div>
                             <div>
-                              <b>@@call_number@@:&#160;</b>
+                              <b>Call Number:&#160;</b>
                               <b class="locCallValue">
                                 <xsl:call-template name="pick-call-number">
                                   <xsl:with-param name="avail" select="notification_data/items/physical_item_display_for_printing/available_items/available_item" />
@@ -868,7 +944,7 @@
                         <td>
                           <div class="emphBox" style="border:2px solid #000; padding:6px;">
                             <div>
-                              <b>@@location@@:&#160;</b>
+                              <b>Location:&#160;</b>
                               <span class="locCallValue">
                                 <xsl:call-template name="pick-location">
                                   <xsl:with-param name="avail" select="notification_data/items/physical_item_display_for_printing/available_items/available_item" />
@@ -876,7 +952,7 @@
                               </span>
                             </div>
                             <div>
-                              <b>@@call_number@@:&#160;</b>
+                              <b>Call Number:&#160;</b>
                               <b class="locCallValue">
                                 <xsl:call-template name="pick-call-number">
                                   <xsl:with-param name="avail" select="notification_data/items/physical_item_display_for_printing/available_items/available_item" />

@@ -2,6 +2,9 @@ const form = document.querySelector('#builder-form');
 const preview = document.querySelector('#xsl-preview');
 const renderedPreview = document.querySelector('#rendered-preview');
 const resetButton = document.querySelector('#reset-button');
+const submitButton = document.querySelector('#submit-button');
+const copyXslButton = document.querySelector('#copy-xsl-button');
+const copyXslButtonLabel = document.querySelector('.copy-button-label');
 const letterSpecificQuestions = document.querySelector('#letter-specific-questions');
 const letterQuestionGroups = Array.from(document.querySelectorAll('[data-letter-question]'));
 const dependentQuestionGroups = Array.from(document.querySelectorAll('[data-dependent-question]'));
@@ -128,6 +131,7 @@ function readFormState() {
   return {
     libraryName: form.elements.libraryName.value.trim(),
     letterType: form.elements.letterType.value,
+    includeLogo: form.elements.includeLogo.value,
     logoUrl: form.elements.logoUrl.value.trim(),
     labelChoice: form.elements.labelChoice.value,
     includeCreateDate: form.elements.includeCreateDate.value,
@@ -187,8 +191,8 @@ function removeSectionByPattern(templateText, pattern) {
 }
 
 function applyLabelChoice(templateText, state) {
-  const shippingPattern = /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B .* SHIPPING LABEL\r?\n[ \t]*NOTE: Use this section if the respondent says they want a shipping label\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B .* SHIPPING LABEL ===== -->[^\S\r\n]*/;
-  const returnPattern = /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B .* SHIPPING LABEL \(SWAPPED ADDRESSES\)\r?\n[ \t]*NOTE: Use this if the respondent says they want a return label\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B .* SHIPPING LABEL \(SWAPPED\) ===== -->[^\S\r\n]*/;
+  const shippingPattern = /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B [—-] SHIPPING LABEL\r?\n[ \t]*NOTE: Addresses MUST remain full; do not truncate\.\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B [—-] SHIPPING LABEL ===== -->[^\S\r\n]*/;
+  const returnPattern = /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B [—-] Return LABEL ?\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B [—-] SHIPPING LABEL \(SWAPPED\) ===== -->[^\S\r\n]*/;
 
   if (state.labelChoice === 'shipping-label') {
     return removeSectionByPattern(templateText, returnPattern);
@@ -256,7 +260,8 @@ function applyNoteAreaChoice(templateText, state) {
 }
 
 function applyTemplateReplacements(templateText, state) {
-  let output = templateText.replaceAll('@@LOGO_URL@@', state.logoUrl || '');
+  const logoUrl = state.includeLogo === 'yes' ? state.logoUrl : '';
+  let output = templateText.replaceAll('@@LOGO_URL@@', logoUrl || '');
 
   if (state.letterType === 'pull-slip-letter') {
     output = applyLabelChoice(output, state);
@@ -443,7 +448,90 @@ async function getSampleXml() {
   return sampleXmlCache;
 }
 
-async function renderTransformedOutput(xslText) {
+function applyLibraryNameToPreviewXml(xmlText, state) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(normalizeXmlForParsing(xmlText), 'application/xml');
+
+  if (xmlDoc.querySelector('parsererror')) {
+    return xmlText;
+  }
+
+  const libraryName = state.libraryName.trim() || 'Your Library';
+
+  xmlDoc.querySelectorAll('*').forEach((node) => {
+    if (node.children.length > 0) {
+      return;
+    }
+
+    if (node.textContent?.trim() === 'California State University, Bakersfield') {
+      node.textContent = libraryName;
+    }
+  });
+
+  return new XMLSerializer().serializeToString(xmlDoc);
+}
+
+function applyCurrentDateToPreviewXml(xmlText) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(normalizeXmlForParsing(xmlText), 'application/xml');
+
+  if (xmlDoc.querySelector('parsererror')) {
+    return xmlText;
+  }
+
+  const now = new Date();
+  const pad = (value) => String(value).padStart(2, '0');
+  const today = `${pad(now.getMonth() + 1)}/${pad(now.getDate())}/${now.getFullYear()}`;
+
+  [
+    'notification_data > borrowing_library_address > create_date',
+    'notification_data > general_data > current_date',
+    'notification_data > incoming_request > create_date',
+    'notification_data > incoming_request > create_date_str',
+    'notification_data > incoming_request > modification_date_str',
+    'notification_data > incoming_request > print_slip_date',
+    'notification_data > incoming_request > print_slip_date_dummy'
+  ].forEach((selector) => {
+    xmlDoc.querySelectorAll(selector).forEach((node) => {
+      node.textContent = today;
+    });
+  });
+
+  return new XMLSerializer().serializeToString(xmlDoc);
+}
+
+function setCopyButtonLabel(label) {
+  copyXslButtonLabel.textContent = label;
+}
+
+function resetCopyButtonLabel() {
+  window.clearTimeout(resetCopyButtonLabel.timeoutId);
+  resetCopyButtonLabel.timeoutId = window.setTimeout(() => {
+    setCopyButtonLabel('Copy');
+  }, 1800);
+}
+
+async function copyPreviewToClipboard() {
+  const text = preview.textContent.trim();
+
+  if (!text) {
+    setCopyButtonLabel('Nothing to Copy');
+    resetCopyButtonLabel();
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(text);
+    setCopyButtonLabel('Copied');
+  } catch (error) {
+    console.error(error);
+    setCopyButtonLabel('Copy Failed');
+  }
+
+  resetCopyButtonLabel();
+}
+
+async function renderTransformedOutput(xslText, state) {
   renderedPreview.innerHTML = '';
 
   if (!window.XSLTProcessor) {
@@ -452,7 +540,9 @@ async function renderTransformedOutput(xslText) {
   }
 
   try {
-    const xmlText = await getSampleXml();
+    let xmlText = await getSampleXml();
+    xmlText = applyLibraryNameToPreviewXml(xmlText, state);
+    xmlText = applyCurrentDateToPreviewXml(xmlText);
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(normalizeXmlForParsing(xmlText), 'application/xml');
     const xslDoc = parser.parseFromString(normalizeXmlForParsing(xslText), 'application/xml');
@@ -479,6 +569,7 @@ async function render() {
   if (!state.letterType) {
     preview.textContent = '';
     renderedPreview.innerHTML = '';
+    submitButton.textContent = 'Submit';
     return;
   }
 
@@ -488,13 +579,15 @@ async function render() {
   try {
     const xslText = await getTemplateText(state);
     preview.textContent = xslText;
-    await renderTransformedOutput(xslText);
+    await renderTransformedOutput(xslText, state);
   } catch (error) {
     console.error(error);
     const fallbackXsl = assembleScaffoldXsl(state);
     preview.textContent = fallbackXsl;
-    await renderTransformedOutput(fallbackXsl);
+    await renderTransformedOutput(fallbackXsl, state);
   }
+
+  submitButton.textContent = 'Generated';
 }
 
 form.addEventListener('submit', (event) => {
@@ -506,10 +599,19 @@ form.elements.letterType.addEventListener('change', () => {
   syncLetterSpecificQuestions();
   preview.textContent = '';
   renderedPreview.innerHTML = '';
+  submitButton.textContent = 'Submit';
 });
 
 form.elements.includeCreateDate.addEventListener('change', () => {
   syncLetterSpecificQuestions();
+});
+
+form.elements.includeLogo.addEventListener('change', () => {
+  syncLetterSpecificQuestions();
+});
+
+copyXslButton.addEventListener('click', () => {
+  copyPreviewToClipboard();
 });
 
 resetButton.addEventListener('click', () => {
@@ -527,6 +629,8 @@ resetButton.addEventListener('click', () => {
     syncLetterSpecificQuestions();
     preview.textContent = '';
     renderedPreview.innerHTML = '';
+    submitButton.textContent = 'Submit';
+    setCopyButtonLabel('Copy');
   });
 });
 

@@ -87,12 +87,26 @@ h1 {
   margin-bottom: 20px;
 }
 
+.form-panel {
+  grid-column: 1 / -1;
+}
+
+.form-panel .panel-heading,
+.form-panel .field-grid,
+.form-panel .actions {
+  max-width: 760px;
+}
+
 .panel {
   background: rgba(255, 255, 255, 0.98);
   border: 1px solid var(--line);
   border-radius: 22px;
   box-shadow: 0 12px 32px rgba(23, 50, 77, 0.06);
   padding: 22px;
+}
+
+.rendered-panel {
+  margin-top: 20px;
 }
 
 .panel-heading {
@@ -104,6 +118,42 @@ h1 {
 .panel-heading h2 {
   color: var(--brand);
   margin-bottom: 6px;
+}
+
+.copy-button {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.copy-icon {
+  display: inline-block;
+  height: 18px;
+  position: relative;
+  width: 18px;
+}
+
+.copy-icon::before,
+.copy-icon::after {
+  background: var(--accent);
+  border: 2px solid currentColor;
+  border-radius: 2px;
+  content: "";
+  height: 12px;
+  position: absolute;
+  width: 9px;
+}
+
+.copy-icon::before {
+  left: 6px;
+  top: 0;
+  z-index: 1;
+}
+
+.copy-icon::after {
+  left: 0;
+  top: 5px;
 }
 
 .field-grid {
