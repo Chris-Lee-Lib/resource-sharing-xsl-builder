@@ -153,7 +153,8 @@ function readFormState() {
     labelChoice: form.elements.labelChoice.value,
     includeCreateDate: form.elements.includeCreateDate.value,
     createDateFormat: form.elements.createDateFormat.value,
-    noteAreaType: form.elements.noteAreaType.value
+    noteAreaType: form.elements.noteAreaType.value,
+    metadataOptions: Array.from(form.querySelectorAll('input[name="metadataOptions"]:checked')).map((input) => input.value)
   };
 }
 
@@ -171,6 +172,10 @@ function slugify(value) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function getLetterDefinition(letterType) {
@@ -290,6 +295,49 @@ function applyNoteAreaChoice(templateText, state) {
   return templateText;
 }
 
+function applyMetadataSelection(templateText, state) {
+  const allMetadataOptions = [
+    'title',
+    'author',
+    'publication-date',
+    'volume',
+    'issue',
+    'pages',
+    'publisher',
+    'place-of-publication',
+    'oclc-number',
+    'borrower-reference',
+    'request-note',
+    'requester-email',
+    'edition',
+    'isbn',
+    'shelving-location-for-item',
+    'chapter-title',
+    'chapter-author',
+    'chapter-number',
+    'journal-title',
+    'article-title',
+    'issn'
+  ];
+  const selectedMetadata = new Set(state.metadataOptions || []);
+  let output = templateText;
+
+  allMetadataOptions.forEach((option) => {
+    if (selectedMetadata.has(option)) {
+      return;
+    }
+
+    const pattern = new RegExp(
+      `[ \\t]*<!-- BEGIN METADATA: ${escapeRegex(option)} -->[\\s\\S]*?<!-- END METADATA: ${escapeRegex(option)} -->[^\\S\\r\\n]*`,
+      'g'
+    );
+
+    output = removeSectionByPattern(output, pattern);
+  });
+
+  return output;
+}
+
 function applyTemplateReplacements(templateText, state) {
   const logoUrl = state.includeLogo === 'yes' ? state.logoUrl : '';
   let output = templateText.replaceAll('@@LOGO_URL@@', logoUrl || '');
@@ -299,6 +347,7 @@ function applyTemplateReplacements(templateText, state) {
     output = applyCreateDateChoice(output, state);
     output = applyCreateDateFormat(output, state);
     output = applyNoteAreaChoice(output, state);
+    output = applyMetadataSelection(output, state);
   }
 
   return output;
