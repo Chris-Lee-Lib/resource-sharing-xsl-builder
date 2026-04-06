@@ -5,6 +5,7 @@ const resetButton = document.querySelector('#reset-button');
 const copyXslButton = document.querySelector('#copy-xsl-button');
 const downloadXslButton = document.querySelector('#download-xsl-button');
 const previewSampleButtons = Array.from(document.querySelectorAll('[data-preview-sample]'));
+const metadataSelectAllButtons = Array.from(document.querySelectorAll('.metadata-select-all'));
 const letterSpecificQuestions = document.querySelector('#letter-specific-questions');
 const letterQuestionGroups = Array.from(document.querySelectorAll('[data-letter-question]'));
 const dependentQuestionGroups = Array.from(document.querySelectorAll('[data-dependent-question]'));
@@ -758,6 +759,7 @@ previewSampleButtons.forEach((button) => {
   button.addEventListener('click', async () => {
     selectedPreviewSample = button.dataset.previewSample || 'book';
     syncPreviewSampleButtons();
+    showToast(`${previewSampleDefinitions[selectedPreviewSample]?.label || 'Book'} XML Selected`);
 
     const xslText = preview.textContent.trim();
 
@@ -767,6 +769,22 @@ previewSampleButtons.forEach((button) => {
 
     renderedPreview.textContent = 'Rendering sample output...';
     await renderTransformedOutput(xslText, readFormState());
+  });
+});
+
+metadataSelectAllButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const group = button.closest('.metadata-group');
+
+    if (!group) {
+      return;
+    }
+
+    group.querySelectorAll('input[name="metadataOptions"]').forEach((input) => {
+      input.checked = true;
+    });
+
+    showToast(`${button.dataset.metadataGroup || 'Metadata'} metadata selected`);
   });
 });
 

@@ -53,10 +53,10 @@
             <span>What format do you want the date to appear?</span>
             <select name="createDateFormat">
               <option value="" selected>Select an option</option>
-              <option value="numerical">Numerical Format (USA)</option>
-              <option value="numerical-europe">Numerical Format (Europe)</option>
-              <option value="readable">Readable Format (USA)</option>
-              <option value="readable-europe">Readable Format (Europe)</option>
+              <option value="numerical">Numerical Format (USA) - 01/15/2026</option>
+              <option value="numerical-europe">Numerical Format (Europe) - 15/01/2026</option>
+              <option value="readable">Readable Format (USA) - January 15, 2026</option>
+              <option value="readable-europe">Readable Format (Europe) - 15 January 2026</option>
             </select>
           </label>
 
@@ -88,7 +88,10 @@
             <legend>Select the metadata you want on the slip.</legend>
 
             <div class="metadata-group">
-              <h4>Shared Metadata</h4>
+              <div class="metadata-group-header">
+                <h4>Shared Metadata</h4>
+                <button type="button" class="button primary metadata-select-all" data-metadata-group="shared">Select All</button>
+              </div>
               <div class="metadata-option-grid">
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="title"><span>Title</span></label>
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="author"><span>Author</span></label>
@@ -106,7 +109,10 @@
             </div>
 
             <div class="metadata-group">
-              <h4>Physical-Only Metadata</h4>
+              <div class="metadata-group-header">
+                <h4>Physical-Only Metadata</h4>
+                <button type="button" class="button primary metadata-select-all" data-metadata-group="physical">Select All</button>
+              </div>
               <div class="metadata-option-grid">
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="edition"><span>Edition</span></label>
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="isbn"><span>ISBN</span></label>
@@ -115,7 +121,10 @@
             </div>
 
             <div class="metadata-group">
-              <h4>Book Chapter-Only Metadata</h4>
+              <div class="metadata-group-header">
+                <h4>Book Chapter-Only Metadata</h4>
+                <button type="button" class="button primary metadata-select-all" data-metadata-group="book-chapter">Select All</button>
+              </div>
               <div class="metadata-option-grid">
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="chapter-title"><span>Chapter Title</span></label>
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="chapter-author"><span>Chapter Author</span></label>
@@ -124,7 +133,10 @@
             </div>
 
             <div class="metadata-group">
-              <h4>Article-Only Metadata</h4>
+              <div class="metadata-group-header">
+                <h4>Article-Only Metadata</h4>
+                <button type="button" class="button primary metadata-select-all" data-metadata-group="article">Select All</button>
+              </div>
               <div class="metadata-option-grid">
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="journal-title"><span>Journal Title</span></label>
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="article-title"><span>Article Title</span></label>
@@ -189,6 +201,7 @@
       <div class="panel-heading">
         <h2>Preview</h2>
         <p>This shows what the generated XSL produces when run against the selected sample XML.</p>
+        <p>This Letter generates different slips based on if the request is for a physical item like a Book or a digital item like a Book Chapter or Article. Use the below options to switch the XML from Book, Book Chapter, and Article to see the various views.</p>
         <div class="preview-actions preview-sample-actions" role="group" aria-label="Preview sample type">
           <button type="button" class="button primary preview-sample-button is-active" data-preview-sample="book">Book</button>
           <button type="button" class="button primary preview-sample-button" data-preview-sample="book-chapter">Book Chapter</button>
