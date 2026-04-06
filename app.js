@@ -232,6 +232,66 @@ function removeSectionByPattern(templateText, pattern) {
   return templateText.replace(pattern, '');
 }
 
+function getShippingLabelBlockPattern() {
+  return /[ \t]*<table class="shippingLabel"[\s\S]*?<!-- ===== END SECTION 10B [^\r\n]*SHIPPING LABEL ===== -->[^\S\r\n]*/;
+}
+
+function getReturnLabelBlockPattern() {
+  return /[ \t]*<table class="shippingLabel"[\s\S]*?<!-- ===== END SECTION 10B - SHIPPING LABEL \(SWAPPED\) ===== -->[^\S\r\n]*/;
+}
+
+function findAllLabelTableStarts(templateText) {
+  return [...templateText.matchAll(/<table class="shippingLabel"/g)].map((match) => match.index);
+}
+
+function findLabelBlockFromStart(templateText, startIndex) {
+  if (startIndex === -1 || startIndex == null) {
+    return null;
+  }
+
+  const endCommentPattern = /<!-- ===== END SECTION 10B[^\n]*SHIPPING LABEL[^\n]*-->/g;
+  endCommentPattern.lastIndex = startIndex;
+  const endMatch = endCommentPattern.exec(templateText);
+
+  if (!endMatch) {
+    return null;
+  }
+
+  const blockEnd = endMatch.index + endMatch[0].length;
+  return {
+    start: startIndex,
+    end: blockEnd,
+    text: templateText.slice(startIndex, blockEnd)
+  };
+}
+
+function removeLabelBlockAtIndex(templateText, startIndex) {
+  const block = findLabelBlockFromStart(templateText, startIndex);
+
+  if (!block) {
+    return templateText;
+  }
+
+  return `${templateText.slice(0, block.start)}${templateText.slice(block.end)}`;
+}
+
+function applySelectedLabelChoice(templateText, state) {
+  const labelStarts = findAllLabelTableStarts(templateText);
+
+  if (state.labelChoice === 'shipping-label') {
+    return removeLabelBlockAtIndex(templateText, labelStarts[1]);
+  }
+
+  if (state.labelChoice === 'return-label') {
+    return removeLabelBlockAtIndex(templateText, labelStarts[0]);
+  }
+
+  return removeLabelBlockAtIndex(
+    removeLabelBlockAtIndex(templateText, labelStarts[1]),
+    labelStarts[0]
+  );
+}
+
 function applyLabelChoice(templateText, state) {
   const shippingPattern = /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B [—-] SHIPPING LABEL\r?\n[ \t]*NOTE: Addresses MUST remain full; do not truncate\.\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B [—-] SHIPPING LABEL ===== -->[^\S\r\n]*/;
   const returnPattern = /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B [—-] Return LABEL ?\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B [—-] SHIPPING LABEL \(SWAPPED\) ===== -->[^\S\r\n]*/;
@@ -344,17 +404,321 @@ function applyMetadataSelection(templateText, state) {
   return output;
 }
 
+function applyLayoutClass(templateText, state) {
+  return templateText.replaceAll('@@LAYOUT_CLASS@@', shouldUseSectionSplitLayout(state) ? 'section-split-layout' : '');
+}
+
+function shouldUseSectionSplitLayout(state) {
+  const splitEligibleMetadata = new Set([
+    'title',
+    'author',
+    'publication-date',
+    'volume',
+    'issue',
+    'pages',
+    'publisher',
+    'place-of-publication',
+    'oclc-number',
+    'borrower-reference',
+    'request-note',
+    'requester-email',
+    'edition',
+    'isbn',
+    'shelving-location-for-item'
+  ]);
+  const metadataCount = (state.metadataOptions || []).filter((option) => splitEligibleMetadata.has(option)).length;
+  return state.letterType === 'pull-slip-letter'
+    && state.labelChoice !== ''
+    && state.labelChoice !== 'no-label'
+    && metadataCount >= 8;
+}
+
+function extractSelectedPhysicalLabelBlock(templateText) {
+  const block = findLabelBlockFromStart(templateText, findAllLabelTableStarts(templateText)[0]);
+
+  if (block) {
+    return {
+      labelBlock: block.text,
+      templateWithoutLabel: `${templateText.slice(0, block.start)}${templateText.slice(block.end)}`
+    };
+  }
+
+  return {
+    labelBlock: '',
+    templateWithoutLabel: templateText
+  };
+}
+
+function extractOptionalNoteAreaBlock(templateText) {
+  const notePattern = /[ \t]*<!-- BEGIN OPTIONAL NOTE AREA -->[\s\S]*?<!-- END OPTIONAL NOTE AREA -->[^\S\r\n]*/;
+  const match = templateText.match(notePattern);
+
+  if (!match) {
+    return {
+      noteBlock: '',
+      templateWithoutNote: templateText
+    };
+  }
+
+  return {
+    noteBlock: match[0],
+    templateWithoutNote: templateText.replace(notePattern, '')
+  };
+}
+
+function buildSplitSideNoteBlock(state) {
+  if (state.noteAreaType === 'none') {
+    return '';
+  }
+
+  if (state.noteAreaType === 'checkboxes') {
+    return [
+      '                          <div style="width:350px; min-width:350px; max-width:350px;">',
+      '                            <b><span style="text-decoration:underline;">Item Condition Report:</span></b>',
+      '                          </div>',
+      '                          <table cellspacing="0" cellpadding="5" border="0" style="width:350px; min-width:350px; max-width:350px; table-layout:fixed; border-collapse:collapse;">',
+      '                            <tr>',
+      '                              <td><b><span style="font-size:18px;">&#9633;</span> Binding Issues</b></td>',
+      '                              <td><b><span style="font-size:18px;">&#9633;</span> Writing</b></td>',
+      '                            </tr>',
+      '                            <tr>',
+      '                              <td><b><span style="font-size:18px;">&#9633;</span> Cover/Spine Issues</b></td>',
+      '                              <td><b><span style="font-size:18px;">&#9633;</span> Liquid/Stained</b></td>',
+      '                            </tr>',
+      '                            <tr>',
+      '                              <td><b><span style="font-size:18px;">&#9633;</span> Missing CD/DVD</b></td>',
+      '                              <td><b><span style="font-size:18px;">&#9633;</span> Other</b></td>',
+      '                            </tr>',
+      '                          </table>',
+      '                          <div style="height:12px;"></div>'
+    ].join('\n');
+  }
+
+  return [
+    '                          <div style="width:350px; min-width:350px; max-width:350px;">',
+    '                            <b>Note:</b>',
+    '                            <div style="display:block; width:350px; border-bottom:1px solid #000; height:14px;"></div>',
+    '                          </div>',
+    '                          <div style="height:12px;"></div>'
+  ].join('\n');
+}
+
+function normalizeMovedLabelBlock(labelBlock) {
+  if (!labelBlock) {
+    return '';
+  }
+
+  return labelBlock
+    .replace(/<tr>\s*<tr>/g, '<tr>')
+    .replace(/<\/tr>\s*<\/tr>/g, '</tr>')
+    .replace(
+      /<table class="shippingLabel"/,
+      '<table class="shippingLabel" style="width:350px; min-width:350px; max-width:350px; table-layout:fixed; border-collapse:collapse;"'
+    )
+    .replace(
+      /<td style="font-size:12px;">/,
+      '<td style="font-size:12px; overflow-wrap:normal; word-break:normal; hyphens:none;">'
+    )
+    .replaceAll(
+      'style="font-size:16px;width:350px"',
+      'style="font-size:16px;width:350px; overflow-wrap:normal; word-break:normal; hyphens:none;"'
+    )
+    .replaceAll(
+      'style="font-size:18px;width:350px"',
+      'style="font-size:18px;width:350px; overflow-wrap:normal; word-break:normal; hyphens:none;"'
+    );
+}
+
+function extractSection08Block(templateText) {
+  const pattern = /[ \t]*<!-- ===== BEGIN SECTION 08 - PARTNER\/POD\/LOGO ===== -->[\s\S]*?<!-- ===== END SECTION 08 - PARTNER\/POD\/LOGO ===== -->[^\S\r\n]*/;
+  const match = templateText.match(pattern);
+
+  if (!match) {
+    return {
+      sectionBlock: '',
+      templateWithoutSection: templateText
+    };
+  }
+
+  return {
+    sectionBlock: match[0],
+    templateWithoutSection: templateText.replace(pattern, '')
+  };
+}
+
+function extractPhysicalSectionBlock(templateText) {
+  const pattern = /[ \t]*<!-- ===== BEGIN SECTION 10 - PHYSICAL ===== -->[\s\S]*?<!-- ===== END SECTION 10 - PHYSICAL ===== -->[^\S\r\n]*/;
+  const match = templateText.match(pattern);
+
+  if (!match) {
+    return {
+      physicalSectionBlock: '',
+      templateWithoutPhysicalSection: templateText
+    };
+  }
+
+  return {
+    physicalSectionBlock: match[0],
+    templateWithoutPhysicalSection: templateText.replace(pattern, '')
+  };
+}
+
+function stripPhysicalSectionWrapper(physicalSectionBlock) {
+  return physicalSectionBlock
+    .replace(/^\s*<!-- ===== BEGIN SECTION 10 - PHYSICAL ===== -->\s*/, '')
+    .replace(/^\s*<xsl:if test="notification_data\/incoming_request\/format = 'PHYSICAL'">\s*/, '')
+    .replace(/\s*<\/xsl:if>\s*$/, '')
+    .replace(/\s*<!-- ===== END SECTION 10 - PHYSICAL ===== -->\s*$/, '');
+}
+
+function trimPhysicalContentForLeftCell(innerPhysicalContent) {
+  let output = innerPhysicalContent.replace(/\s*<!-- ===== END SECTION 10 - PHYSICAL ===== -->\s*$/, '');
+  const section10bIndex = output.indexOf('SECTION 10B');
+
+  if (section10bIndex !== -1) {
+    const commentStart = output.lastIndexOf('<!--', section10bIndex);
+
+    if (commentStart !== -1) {
+      output = output.slice(0, commentStart);
+    }
+  }
+
+  return output.trim();
+}
+
+function extractPhysicalLabelBlock(templateText) {
+  const blockPatterns = [
+    /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B [â€”-] SHIPPING LABEL\r?\n[ \t]*NOTE: Addresses MUST remain full; do not truncate\.\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B [â€”-] SHIPPING LABEL ===== -->[^\S\r\n]*/,
+    /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B [â€”-] Return LABEL ?\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B [â€”-] SHIPPING LABEL \(SWAPPED\) ===== -->[^\S\r\n]*/
+  ];
+
+  for (const pattern of blockPatterns) {
+    const match = templateText.match(pattern);
+    if (match) {
+      return {
+        labelBlock: match[0],
+        templateWithoutLabel: templateText.replace(pattern, '')
+      };
+    }
+  }
+
+  return {
+    labelBlock: '',
+    templateWithoutLabel: templateText
+  };
+}
+
+function applySectionSplitLayout(templateText, state) {
+  if (!shouldUseSectionSplitLayout(state)) {
+    return templateText.replaceAll('@@HEADER_ADJACENT_LABEL_CELL@@', '');
+  }
+
+  const { sectionBlock, templateWithoutSection } = extractSection08Block(templateText);
+  const { physicalSectionBlock, templateWithoutPhysicalSection } = extractPhysicalSectionBlock(templateWithoutSection);
+
+  if (!sectionBlock || !physicalSectionBlock) {
+    return templateText.replaceAll('@@HEADER_ADJACENT_LABEL_CELL@@', '');
+  }
+
+  const { labelBlock, templateWithoutLabel } = extractSelectedPhysicalLabelBlock(physicalSectionBlock);
+  const { templateWithoutNote } = extractOptionalNoteAreaBlock(templateWithoutLabel);
+  let output = templateWithoutPhysicalSection;
+
+  output = output.replace(
+    '<div class="rsSlipOuter">',
+    '<div class="rsSlipOuter" style="width:702px !important; max-width:702px !important; overflow:visible;">'
+  );
+
+  output = output.replace(
+    '<div class="rsSlip rsSlipInner">',
+    '<div class="rsSlip rsSlipInner" style="width:702px !important; max-width:702px !important;">'
+  );
+
+  output = output.replace(
+    /(<div class="messageBody">\s*<table role="presentation" border="0" cellspacing="0" cellpadding="0" style=")width:350px; max-width:350px; border-collapse:collapse; table-layout:fixed;(")/,
+    '$1width:702px !important; max-width:702px !important; border-collapse:collapse; table-layout:fixed;$2'
+  );
+
+  output = output.replace(
+    /(<td class="split-layout-main-cell" style=")width:350px; border:0; padding:0; vertical-align:top;(")/,
+    '$1width:702px !important; border:0; padding:0; vertical-align:top;$2 colspan="2"'
+  );
+
+  output = output.replace(
+    /(<!-- ===== BEGIN SECTION 09 - MAIN CONTENT TABLE ===== -->\s*<table role="presentation" cellspacing="0" cellpadding="2" border="0" style=")width:350px; max-width:350px; table-layout:fixed;(")/,
+    '$1width:702px !important; max-width:702px !important; table-layout:fixed;$2'
+  );
+
+  output = output.replace(
+    '<td style="width:350px; border:0; padding:0;" colspan="2">',
+    '<td style="width:702px !important; border:0; padding:0;" colspan="2">'
+  );
+
+  const sideNoteBlock = buildSplitSideNoteBlock(state);
+  const normalizedLabelBlock = normalizeMovedLabelBlock(labelBlock);
+  const sideParts = [sideNoteBlock, normalizedLabelBlock].filter(Boolean).map((part) => part.trim()).join('\n');
+  const sideColumnBlock = [
+    '<div style="width:350px; min-width:350px; max-width:350px; margin:0; text-align:left;">',
+    sideParts,
+    '</div>'
+  ].join('\n');
+
+  if (!sideParts) {
+    return output.replaceAll('@@HEADER_ADJACENT_LABEL_CELL@@', '');
+  }
+
+  const leftPhysicalContent = trimPhysicalContentForLeftCell(stripPhysicalSectionWrapper(templateWithoutNote));
+
+  const rebuiltPhysicalBlock = [
+    `                  <xsl:if test="notification_data/incoming_request/format = 'PHYSICAL'">`,
+    '                    <div style="position:relative; width:702px !important; max-width:702px !important; margin:0;">',
+    '                      <div style="width:350px !important; min-width:350px; max-width:350px; margin-right:352px; vertical-align:top; text-align:left;">',
+    sectionBlock.trim(),
+    '                          <table role="presentation" cellspacing="0" cellpadding="2" border="0" style="width:350px; max-width:350px; table-layout:fixed;">',
+    leftPhysicalContent,
+    '                          </table>',
+    '                      </div>',
+    '                      <div style="position:absolute; top:0; left:352px; width:350px !important; min-width:350px; max-width:350px; vertical-align:top; text-align:left;">',
+    sideColumnBlock,
+    '                      </div>',
+    '                    </div>',
+    '                  </xsl:if>'
+  ].join('\n');
+
+  output = output.replace(
+    '<!-- ===== BEGIN SECTION 08 - PARTNER/POD/LOGO ===== -->',
+    `                <xsl:if test="notification_data/incoming_request/format != 'PHYSICAL'">\n<!-- ===== BEGIN SECTION 08 - PARTNER/POD/LOGO ===== -->`
+  );
+
+  output = output.replace(
+    '<!-- ===== END SECTION 08 - PARTNER/POD/LOGO ===== -->',
+    `<!-- ===== END SECTION 08 - PARTNER/POD/LOGO ===== -->\n                </xsl:if>`
+  );
+
+  output = output.replace(
+    '                  <!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->',
+    `${rebuiltPhysicalBlock}\n\n                  <!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->`
+  );
+
+  output = output.replaceAll('@@HEADER_ADJACENT_LABEL_CELL@@', '');
+
+  return output;
+}
+
 function applyTemplateReplacements(templateText, state) {
   const logoUrl = state.includeLogo === 'yes' ? state.logoUrl : '';
   let output = templateText.replaceAll('@@LOGO_URL@@', logoUrl || '');
 
   if (state.letterType === 'pull-slip-letter') {
-    output = applyLabelChoice(output, state);
+    output = applySelectedLabelChoice(output, state);
     output = applyCreateDateChoice(output, state);
     output = applyCreateDateFormat(output, state);
     output = applyNoteAreaChoice(output, state);
     output = applyMetadataSelection(output, state);
+    output = applySectionSplitLayout(output, state);
   }
+
+  output = applyLayoutClass(output, state);
 
   return output;
 }
@@ -507,7 +871,7 @@ async function getTemplateText(state) {
   }
 
   if (!templateCache[definition.templateFile]) {
-    const response = await fetch(definition.templateFile);
+    const response = await fetch(definition.templateFile, { cache: 'no-store' });
 
     if (!response.ok) {
       throw new Error(`Failed to load template: ${definition.templateFile}`);
@@ -534,7 +898,7 @@ async function getSampleXml(sampleType = selectedPreviewSample) {
     return sampleXmlCache[sampleDefinition.file];
   }
 
-  const response = await fetch(sampleDefinition.file);
+  const response = await fetch(sampleDefinition.file, { cache: 'no-store' });
 
   if (!response.ok) {
     throw new Error(`Failed to load ${sampleDefinition.label} sample XML`);
@@ -627,6 +991,7 @@ function cleanPreviewPlaceholderLabels(root) {
 
 function buildPaginatedPreview(container) {
   const sourceMarkup = container.innerHTML.trim();
+  const hasSectionSplitLayout = container.classList.contains('section-split-layout');
 
   if (!sourceMarkup) {
     return;
@@ -665,6 +1030,7 @@ function buildPaginatedPreview(container) {
 
     const content = document.createElement('div');
     content.className = 'preview-paper-content';
+    content.classList.toggle('section-split-layout', hasSectionSplitLayout);
     content.style.width = `${PREVIEW_CONTENT_WIDTH}px`;
     content.style.transform = `translateY(-${pageIndex * PREVIEW_CONTENT_HEIGHT}px) scale(${scale})`;
     content.innerHTML = sourceMarkup;
@@ -734,6 +1100,7 @@ function downloadPreviewAsText() {
 
 async function renderTransformedOutput(xslText, state) {
   renderedPreview.innerHTML = '';
+  renderedPreview.classList.toggle('section-split-layout', shouldUseSectionSplitLayout(state));
 
   if (!window.XSLTProcessor) {
     renderedPreview.textContent = 'This browser does not support in-page XSLT preview.';

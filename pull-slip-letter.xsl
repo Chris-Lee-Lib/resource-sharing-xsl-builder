@@ -328,7 +328,6 @@
           .rsSlip .locCallValue { font-size: 16pt !important; line-height: 1.2 !important; }
 
           .rsSlip table {
-            width: 100% !important;
             max-width: 100% !important;
             border-collapse: collapse !important;
             table-layout: fixed !important;
@@ -341,7 +340,6 @@
           }
 
           .rsSlip table.shippingLabel {
-            width: 100% !important;
             max-width: 100% !important;
             border-collapse: collapse !important;
             margin: 0 !important;
@@ -376,6 +374,7 @@
           }
 
           .rsSlip br { line-height: 0.55 !important; }
+
         </style>
         <!-- ===== END SECTION 03A - PRINT CSS ===== -->
       </head>
@@ -386,7 +385,7 @@
            SECTION 04 - BODY ROOT
            NOTE: Contains outer border wrapper and scaled inner content.
            ================================================================ -->
-      <body>
+      <body class="@@LAYOUT_CLASS@@">
 
         <!-- ================================================================
              SECTION 05 - OUTER BORDER WRAPPER (NOT SCALED)
@@ -404,6 +403,10 @@
                  ============================================================ -->
             <div class="messageArea">
               <div class="messageBody">
+
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="width:350px; max-width:350px; border-collapse:collapse; table-layout:fixed;">
+                  <tr>
+                    <td class="split-layout-main-cell" style="width:350px; border:0; padding:0; vertical-align:top;">
 
                 <!-- ============================================================
                      SECTION 08 - HEADER BLOCK (PARTNER + POD + LOGO)
@@ -494,6 +497,11 @@
 
                 <xsl:call-template name="spacer" />
                 <!-- ===== END SECTION 08 - PARTNER/POD/LOGO ===== -->
+                    </td>
+@@HEADER_ADJACENT_LABEL_CELL@@
+                  </tr>
+                  <tr>
+                    <td style="width:350px; border:0; padding:0;" colspan="2">
 
 
                 <!-- ============================================================
@@ -541,29 +549,38 @@
                     </xsl:if>
                     <!-- END METADATA: author -->
 
-                    <!-- BEGIN METADATA: volume -->
-                    <xsl:if test="normalize-space(notification_data/metadata/volume) != ''">
+                    <xsl:if test="normalize-space(notification_data/metadata/publication_date) != '' or normalize-space(notification_data/metadata/volume) != '' or normalize-space(notification_data/metadata/issue) != '' or normalize-space(notification_data/metadata/pages) != ''">
                       <tr>
-                        <td style="width:350px;"><b>@@volume@@:&#160;</b><xsl:value-of select="notification_data/metadata/volume" /></td>
+                        <td style="width:350px;">
+                          <table cellspacing="0" cellpadding="5" border="0" style="width:350px; max-width:350px; table-layout:fixed; border-collapse:collapse;">
+                            <tr>
+                              <!-- BEGIN METADATA: publication-date -->
+                              <xsl:if test="normalize-space(notification_data/metadata/publication_date) != ''">
+                                <td><b>@@year@@:&#160;</b><xsl:value-of select="notification_data/metadata/publication_date" /></td>
+                              </xsl:if>
+                              <!-- END METADATA: publication-date -->
+                              <!-- BEGIN METADATA: volume -->
+                              <xsl:if test="normalize-space(notification_data/metadata/volume) != ''">
+                                <td><b>@@volume@@:&#160;</b><xsl:value-of select="notification_data/metadata/volume" /></td>
+                              </xsl:if>
+                              <!-- END METADATA: volume -->
+                            </tr>
+                            <tr>
+                              <!-- BEGIN METADATA: issue -->
+                              <xsl:if test="normalize-space(notification_data/metadata/issue) != ''">
+                                <td><b>@@issue@@:&#160;</b><xsl:value-of select="notification_data/metadata/issue" /></td>
+                              </xsl:if>
+                              <!-- END METADATA: issue -->
+                              <!-- BEGIN METADATA: pages -->
+                              <xsl:if test="normalize-space(notification_data/metadata/pages) != ''">
+                                <td><b>@@pages@@:&#160;</b><xsl:value-of select="notification_data/metadata/pages" /></td>
+                              </xsl:if>
+                              <!-- END METADATA: pages -->
+                            </tr>
+                          </table>
+                        </td>
                       </tr>
                     </xsl:if>
-                    <!-- END METADATA: volume -->
-
-                    <!-- BEGIN METADATA: issue -->
-                    <xsl:if test="normalize-space(notification_data/metadata/issue) != ''">
-                      <tr>
-                        <td style="width:350px;"><b>@@issue@@:&#160;</b><xsl:value-of select="notification_data/metadata/issue" /></td>
-                      </tr>
-                    </xsl:if>
-                    <!-- END METADATA: issue -->
-
-                    <!-- BEGIN METADATA: pages -->
-                    <xsl:if test="normalize-space(notification_data/metadata/pages) != ''">
-                      <tr>
-                        <td style="width:350px;"><b>@@pages@@:&#160;</b><xsl:value-of select="notification_data/metadata/pages" /></td>
-                      </tr>
-                    </xsl:if>
-                    <!-- END METADATA: pages -->
 
                     <!-- BEGIN METADATA: borrower-reference -->
                     <tr>
@@ -578,14 +595,6 @@
                       </tr>
                     </xsl:if>
                     <!-- END METADATA: oclc-number -->
-
-                    <!-- BEGIN METADATA: publication-date -->
-                    <xsl:if test="normalize-space(notification_data/metadata/publication_date) != ''">
-                      <tr>
-                        <td style="width:350px;"><b>@@year@@:&#160;</b><xsl:value-of select="notification_data/metadata/publication_date" /></td>
-                      </tr>
-                    </xsl:if>
-                    <!-- END METADATA: publication-date -->
 
                     <!-- BEGIN METADATA: publisher -->
                     <xsl:if test="normalize-space(notification_data/metadata/publisher) != ''">
@@ -690,7 +699,7 @@
                       <tr>
                         <td style="font-size:16px;width:350px">
                           <font size="2">Return To: </font>
-                          <br /><br />
+                          <br />
 
                           <!-- FULL ADDRESS — NEVER TRUNCATE -->
                           <center><b><xsl:value-of select="notification_data/items/physical_item_display_for_printing/owning_library_details/address1" /></b></center>
@@ -788,7 +797,7 @@
                       <tr>
                         <td style="font-size:16px;width:350px">
                           <font size="2">Return To: </font>
-                          <br /><br />
+                          <br />
 
                           <xsl:choose>
 
@@ -929,29 +938,38 @@
                       </xsl:if>
                       <!-- END METADATA: author -->
 
-                      <!-- BEGIN METADATA: publication-date -->
-                      <xsl:if test="normalize-space(notification_data/metadata/publication_date) != ''">
-                        <tr><td><b>@@year@@:&#160;</b><xsl:value-of select="notification_data/metadata/publication_date" /></td></tr>
+                      <xsl:if test="normalize-space(notification_data/metadata/publication_date) != '' or normalize-space(notification_data/metadata/volume) != '' or normalize-space(notification_data/metadata/issue) != '' or normalize-space(notification_data/metadata/pages) != ''">
+                        <tr>
+                          <td>
+                            <table cellspacing="0" cellpadding="5" border="0" style="width:350px; max-width:350px; table-layout:fixed; border-collapse:collapse;">
+                              <tr>
+                                <!-- BEGIN METADATA: publication-date -->
+                                <xsl:if test="normalize-space(notification_data/metadata/publication_date) != ''">
+                                  <td><b>@@year@@:&#160;</b><xsl:value-of select="notification_data/metadata/publication_date" /></td>
+                                </xsl:if>
+                                <!-- END METADATA: publication-date -->
+                                <!-- BEGIN METADATA: volume -->
+                                <xsl:if test="normalize-space(notification_data/metadata/volume) != ''">
+                                  <td><b>@@volume@@:&#160;</b><xsl:value-of select="notification_data/metadata/volume" /></td>
+                                </xsl:if>
+                                <!-- END METADATA: volume -->
+                              </tr>
+                              <tr>
+                                <!-- BEGIN METADATA: issue -->
+                                <xsl:if test="normalize-space(notification_data/metadata/issue) != ''">
+                                  <td><b>@@issue@@:&#160;</b><xsl:value-of select="notification_data/metadata/issue" /></td>
+                                </xsl:if>
+                                <!-- END METADATA: issue -->
+                                <!-- BEGIN METADATA: pages -->
+                                <xsl:if test="normalize-space(notification_data/metadata/pages) != ''">
+                                  <td><b>@@pages@@:&#160;</b><xsl:value-of select="notification_data/metadata/pages" /></td>
+                                </xsl:if>
+                                <!-- END METADATA: pages -->
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
                       </xsl:if>
-                      <!-- END METADATA: publication-date -->
-
-                      <!-- BEGIN METADATA: volume -->
-                      <xsl:if test="normalize-space(notification_data/metadata/volume) != ''">
-                        <tr><td><b>@@volume@@:&#160;</b><xsl:value-of select="notification_data/metadata/volume" /></td></tr>
-                      </xsl:if>
-                      <!-- END METADATA: volume -->
-
-                      <!-- BEGIN METADATA: issue -->
-                      <xsl:if test="normalize-space(notification_data/metadata/issue) != ''">
-                        <tr><td><b>@@issue@@:&#160;</b><xsl:value-of select="notification_data/metadata/issue" /></td></tr>
-                      </xsl:if>
-                      <!-- END METADATA: issue -->
-
-                      <!-- BEGIN METADATA: pages -->
-                      <xsl:if test="normalize-space(notification_data/metadata/pages) != ''">
-                        <tr><td><b>@@pages@@:&#160;</b><xsl:value-of select="notification_data/metadata/pages" /></td></tr>
-                      </xsl:if>
-                      <!-- END METADATA: pages -->
 
                       <!-- BEGIN METADATA: issn -->
                       <xsl:if test="normalize-space(notification_data/metadata/issn) != ''">
@@ -1039,12 +1057,6 @@
                       </xsl:if>
                       <!-- END METADATA: author -->
 
-                      <!-- BEGIN METADATA: publication-date -->
-                      <xsl:if test="normalize-space(notification_data/metadata/publication_date) != ''">
-                        <tr><td><b>@@year@@:&#160;</b><xsl:value-of select="notification_data/metadata/publication_date" /></td></tr>
-                      </xsl:if>
-                      <!-- END METADATA: publication-date -->
-
                       <!-- BEGIN METADATA: chapter-number -->
                       <xsl:if test="normalize-space(notification_data/metadata/chapter) != ''">
                         <tr>
@@ -1087,11 +1099,38 @@
                       </xsl:if>
                       <!-- END METADATA: chapter-author -->
 
-                      <!-- BEGIN METADATA: pages -->
-                      <xsl:if test="normalize-space(notification_data/metadata/pages) != ''">
-                        <tr><td><b>@@pages@@:&#160;</b><xsl:value-of select="notification_data/metadata/pages" /></td></tr>
+                      <xsl:if test="normalize-space(notification_data/metadata/publication_date) != '' or normalize-space(notification_data/metadata/volume) != '' or normalize-space(notification_data/metadata/issue) != '' or normalize-space(notification_data/metadata/pages) != ''">
+                        <tr>
+                          <td>
+                            <table cellspacing="0" cellpadding="5" border="0" style="width:350px; max-width:350px; table-layout:fixed; border-collapse:collapse;">
+                              <tr>
+                                <!-- BEGIN METADATA: publication-date -->
+                                <xsl:if test="normalize-space(notification_data/metadata/publication_date) != ''">
+                                  <td><b>@@year@@:&#160;</b><xsl:value-of select="notification_data/metadata/publication_date" /></td>
+                                </xsl:if>
+                                <!-- END METADATA: publication-date -->
+                                <!-- BEGIN METADATA: volume -->
+                                <xsl:if test="normalize-space(notification_data/metadata/volume) != ''">
+                                  <td><b>@@volume@@:&#160;</b><xsl:value-of select="notification_data/metadata/volume" /></td>
+                                </xsl:if>
+                                <!-- END METADATA: volume -->
+                              </tr>
+                              <tr>
+                                <!-- BEGIN METADATA: issue -->
+                                <xsl:if test="normalize-space(notification_data/metadata/issue) != ''">
+                                  <td><b>@@issue@@:&#160;</b><xsl:value-of select="notification_data/metadata/issue" /></td>
+                                </xsl:if>
+                                <!-- END METADATA: issue -->
+                                <!-- BEGIN METADATA: pages -->
+                                <xsl:if test="normalize-space(notification_data/metadata/pages) != ''">
+                                  <td><b>@@pages@@:&#160;</b><xsl:value-of select="notification_data/metadata/pages" /></td>
+                                </xsl:if>
+                                <!-- END METADATA: pages -->
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
                       </xsl:if>
-                      <!-- END METADATA: pages -->
 
                       <!-- BEGIN METADATA: publisher -->
                       <xsl:if test="normalize-space(notification_data/metadata/publisher) != ''">
@@ -1110,18 +1149,6 @@
                         <tr><td><b>@@oclc_number@@:&#160;</b><xsl:value-of select="notification_data/metadata/oclc_number" /></td></tr>
                       </xsl:if>
                       <!-- END METADATA: oclc-number -->
-
-                      <!-- BEGIN METADATA: volume -->
-                      <xsl:if test="normalize-space(notification_data/metadata/volume) != ''">
-                        <tr><td><b>@@volume@@:&#160;</b><xsl:value-of select="notification_data/metadata/volume" /></td></tr>
-                      </xsl:if>
-                      <!-- END METADATA: volume -->
-
-                      <!-- BEGIN METADATA: issue -->
-                      <xsl:if test="normalize-space(notification_data/metadata/issue) != ''">
-                        <tr><td><b>@@issue@@:&#160;</b><xsl:value-of select="notification_data/metadata/issue" /></td></tr>
-                      </xsl:if>
-                      <!-- END METADATA: issue -->
 
                       <!-- BEGIN METADATA: borrower-reference -->
                       <tr><td><b>@@borrower_reference@@:</b><xsl:text> </xsl:text><xsl:call-template name="id-info-hdr" /></td></tr>
@@ -1168,6 +1195,9 @@
 
                 </table>
                 <!-- ===== END SECTION 09 - MAIN CONTENT TABLE ===== -->
+                    </td>
+                  </tr>
+                </table>
 
               </div>
             </div>
