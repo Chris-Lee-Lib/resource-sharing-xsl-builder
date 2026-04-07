@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="224" height="104" viewBox="0 0 224 104" role="img" aria-label="Group qualifier barcode">
+  <rect width="224" height="104" fill="#ffffff"/>
+  <g fill="#111111">
+    <rect x="12" y="10" width="2" height="66"/>
+    <rect x="16" y="10" width="1" height="66"/>
+    <rect x="20" y="10" width="3" height="66"/>
+    <rect x="26" y="10" width="2" height="66"/>
+    <rect x="31" y="10" width="1" height="66"/>
+    <rect x="35" y="10" width="4" height="66"/>
+    <rect x="42" y="10" width="2" height="66"/>
+    <rect x="47" y="10" width="1" height="66"/>
+    <rect x="50" y="10" width="3" height="66"/>
+    <rect x="56" y="10" width="2" height="66"/>
+    <rect x="61" y="10" width="1" height="66"/>
+    <rect x="65" y="10" width="4" height="66"/>
+    <rect x="72" y="10" width="2" height="66"/>
+    <rect x="76" y="10" width="1" height="66"/>
+    <rect x="80" y="10" width="3" height="66"/>
+    <rect x="86" y="10" width="2" height="66"/>
+    <rect x="91" y="10" width="1" height="66"/>
+    <rect x="95" y="10" width="4" height="66"/>
+    <rect x="102" y="10" width="2" height="66"/>
+    <rect x="107" y="10" width="1" height="66"/>
+    <rect x="110" y="10" width="3" height="66"/>
+    <rect x="116" y="10" width="2" height="66"/>
+    <rect x="121" y="10" width="1" height="66"/>
+    <rect x="125" y="10" width="4" height="66"/>
+    <rect x="132" y="10" width="2" height="66"/>
+    <rect x="136" y="10" width="1" height="66"/>
+    <rect x="140" y="10" width="3" height="66"/>
+    <rect x="146" y="10" width="2" height="66"/>
+    <rect x="151" y="10" width="1" height="66"/>
+    <rect x="155" y="10" width="4" height="66"/>
+    <rect x="162" y="10" width="2" height="66"/>
+    <rect x="167" y="10" width="1" height="66"/>
+    <rect x="170" y="10" width="3" height="66"/>
+    <rect x="176" y="10" width="2" height="66"/>
+    <rect x="181" y="10" width="1" height="66"/>
+    <rect x="185" y="10" width="4" height="66"/>
+    <rect x="192" y="10" width="2" height="66"/>
+    <rect x="197" y="10" width="1" height="66"/>
+    <rect x="200" y="10" width="3" height="66"/>
+    <rect x="206" y="10" width="2" height="66"/>
+  </g>
+  <text x="112" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#111111">01MCU0000001</text>
+</svg>

@@ -18,6 +18,102 @@ const PREVIEW_PAGE_HEIGHT = 1056;
 const PREVIEW_PAGE_MARGIN = 48;
 const PREVIEW_CONTENT_WIDTH = PREVIEW_PAGE_WIDTH - (PREVIEW_PAGE_MARGIN * 2);
 const PREVIEW_CONTENT_HEIGHT = PREVIEW_PAGE_HEIGHT - (PREVIEW_PAGE_MARGIN * 2);
+const PREVIEW_GROUP_QUALIFIER_BARCODE_SRC = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="224" height="104" viewBox="0 0 224 104">
+  <rect width="224" height="104" fill="#fff"/>
+  <g fill="#111">
+    <rect x="12" y="10" width="2" height="66"/>
+    <rect x="16" y="10" width="1" height="66"/>
+    <rect x="20" y="10" width="3" height="66"/>
+    <rect x="26" y="10" width="2" height="66"/>
+    <rect x="31" y="10" width="1" height="66"/>
+    <rect x="35" y="10" width="4" height="66"/>
+    <rect x="42" y="10" width="2" height="66"/>
+    <rect x="47" y="10" width="1" height="66"/>
+    <rect x="50" y="10" width="3" height="66"/>
+    <rect x="56" y="10" width="2" height="66"/>
+    <rect x="61" y="10" width="1" height="66"/>
+    <rect x="65" y="10" width="4" height="66"/>
+    <rect x="72" y="10" width="2" height="66"/>
+    <rect x="76" y="10" width="1" height="66"/>
+    <rect x="80" y="10" width="3" height="66"/>
+    <rect x="86" y="10" width="2" height="66"/>
+    <rect x="91" y="10" width="1" height="66"/>
+    <rect x="95" y="10" width="4" height="66"/>
+    <rect x="102" y="10" width="2" height="66"/>
+    <rect x="107" y="10" width="1" height="66"/>
+    <rect x="110" y="10" width="3" height="66"/>
+    <rect x="116" y="10" width="2" height="66"/>
+    <rect x="121" y="10" width="1" height="66"/>
+    <rect x="125" y="10" width="4" height="66"/>
+    <rect x="132" y="10" width="2" height="66"/>
+    <rect x="136" y="10" width="1" height="66"/>
+    <rect x="140" y="10" width="3" height="66"/>
+    <rect x="146" y="10" width="2" height="66"/>
+    <rect x="151" y="10" width="1" height="66"/>
+    <rect x="155" y="10" width="4" height="66"/>
+    <rect x="162" y="10" width="2" height="66"/>
+    <rect x="167" y="10" width="1" height="66"/>
+    <rect x="170" y="10" width="3" height="66"/>
+    <rect x="176" y="10" width="2" height="66"/>
+    <rect x="181" y="10" width="1" height="66"/>
+    <rect x="185" y="10" width="4" height="66"/>
+    <rect x="192" y="10" width="2" height="66"/>
+    <rect x="197" y="10" width="1" height="66"/>
+    <rect x="200" y="10" width="3" height="66"/>
+    <rect x="206" y="10" width="2" height="66"/>
+  </g>
+  <text x="112" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#111">01MCU0000001</text>
+</svg>
+`)}`;
+const PREVIEW_INTERNAL_ID_BARCODE_SRC = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="224" height="104" viewBox="0 0 224 104">
+  <rect width="224" height="104" fill="#fff"/>
+  <g fill="#111">
+    <rect x="12" y="10" width="2" height="66"/>
+    <rect x="16" y="10" width="1" height="66"/>
+    <rect x="20" y="10" width="3" height="66"/>
+    <rect x="26" y="10" width="2" height="66"/>
+    <rect x="31" y="10" width="1" height="66"/>
+    <rect x="35" y="10" width="4" height="66"/>
+    <rect x="42" y="10" width="2" height="66"/>
+    <rect x="47" y="10" width="1" height="66"/>
+    <rect x="50" y="10" width="3" height="66"/>
+    <rect x="56" y="10" width="2" height="66"/>
+    <rect x="61" y="10" width="1" height="66"/>
+    <rect x="65" y="10" width="4" height="66"/>
+    <rect x="72" y="10" width="2" height="66"/>
+    <rect x="76" y="10" width="1" height="66"/>
+    <rect x="80" y="10" width="3" height="66"/>
+    <rect x="86" y="10" width="2" height="66"/>
+    <rect x="91" y="10" width="1" height="66"/>
+    <rect x="95" y="10" width="4" height="66"/>
+    <rect x="102" y="10" width="2" height="66"/>
+    <rect x="107" y="10" width="1" height="66"/>
+    <rect x="110" y="10" width="3" height="66"/>
+    <rect x="116" y="10" width="2" height="66"/>
+    <rect x="121" y="10" width="1" height="66"/>
+    <rect x="125" y="10" width="4" height="66"/>
+    <rect x="132" y="10" width="2" height="66"/>
+    <rect x="136" y="10" width="1" height="66"/>
+    <rect x="140" y="10" width="3" height="66"/>
+    <rect x="146" y="10" width="2" height="66"/>
+    <rect x="151" y="10" width="1" height="66"/>
+    <rect x="155" y="10" width="4" height="66"/>
+    <rect x="162" y="10" width="2" height="66"/>
+    <rect x="167" y="10" width="1" height="66"/>
+    <rect x="170" y="10" width="3" height="66"/>
+    <rect x="176" y="10" width="2" height="66"/>
+    <rect x="181" y="10" width="1" height="66"/>
+    <rect x="185" y="10" width="4" height="66"/>
+    <rect x="192" y="10" width="2" height="66"/>
+    <rect x="197" y="10" width="1" height="66"/>
+    <rect x="200" y="10" width="3" height="66"/>
+    <rect x="206" y="10" width="2" height="66"/>
+  </g>
+  <text x="112" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#111">000000000000001</text>
+</svg>
+`)}`;
 
 const previewSampleDefinitions = {
   book: {
@@ -427,10 +523,37 @@ function shouldUseSectionSplitLayout(state) {
     'shelving-location-for-item'
   ]);
   const metadataCount = (state.metadataOptions || []).filter((option) => splitEligibleMetadata.has(option)).length;
+  const hasCheckboxConditionReport = state.noteAreaType === 'checkboxes';
   return state.letterType === 'pull-slip-letter'
     && state.labelChoice !== ''
     && state.labelChoice !== 'no-label'
-    && metadataCount >= 8;
+    && (metadataCount >= 8 || hasCheckboxConditionReport);
+}
+
+function shouldUseDigitalSectionSplitLayout(state) {
+  const digitalSplitEligibleMetadata = new Set([
+    'title',
+    'author',
+    'publication-date',
+    'volume',
+    'issue',
+    'pages',
+    'publisher',
+    'place-of-publication',
+    'oclc-number',
+    'borrower-reference',
+    'request-note',
+    'journal-title',
+    'article-title',
+    'issn',
+    'chapter-number',
+    'chapter-title',
+    'chapter-author'
+  ]);
+
+  const metadataCount = (state.metadataOptions || []).filter((option) => digitalSplitEligibleMetadata.has(option)).length;
+
+  return state.letterType === 'pull-slip-letter' && metadataCount > 5;
 }
 
 function extractSelectedPhysicalLabelBlock(templateText) {
@@ -513,7 +636,7 @@ function normalizeMovedLabelBlock(labelBlock) {
     .replace(/<\/tr>\s*<\/tr>/g, '</tr>')
     .replace(
       /<table class="shippingLabel"/,
-      '<table class="shippingLabel" style="width:350px; min-width:350px; max-width:350px; table-layout:fixed; border-collapse:collapse;"'
+      '<table class="shippingLabel" style="width:336px; min-width:336px; max-width:336px; table-layout:fixed; border-collapse:collapse;"'
     )
     .replace(
       /<td style="font-size:12px;">/,
@@ -521,11 +644,11 @@ function normalizeMovedLabelBlock(labelBlock) {
     )
     .replaceAll(
       'style="font-size:16px;width:350px"',
-      'style="font-size:16px;width:350px; overflow-wrap:normal; word-break:normal; hyphens:none;"'
+      'style="font-size:16px;width:336px; overflow-wrap:normal; word-break:normal; hyphens:none;"'
     )
     .replaceAll(
       'style="font-size:18px;width:350px"',
-      'style="font-size:18px;width:350px; overflow-wrap:normal; word-break:normal; hyphens:none;"'
+      'style="font-size:18px;width:336px; overflow-wrap:normal; word-break:normal; hyphens:none;"'
     );
 }
 
@@ -546,6 +669,18 @@ function extractSection08Block(templateText) {
   };
 }
 
+function wrapSection08ForDigital(sectionBlock) {
+  if (!sectionBlock) {
+    return '';
+  }
+
+  return [
+    `                <xsl:if test="notification_data/incoming_request/format != 'PHYSICAL'">`,
+    sectionBlock.trim(),
+    '                </xsl:if>'
+  ].join('\n');
+}
+
 function extractPhysicalSectionBlock(templateText) {
   const pattern = /[ \t]*<!-- ===== BEGIN SECTION 10 - PHYSICAL ===== -->[\s\S]*?<!-- ===== END SECTION 10 - PHYSICAL ===== -->[^\S\r\n]*/;
   const match = templateText.match(pattern);
@@ -561,6 +696,182 @@ function extractPhysicalSectionBlock(templateText) {
     physicalSectionBlock: match[0],
     templateWithoutPhysicalSection: templateText.replace(pattern, '')
   };
+}
+
+function extractDigitalSectionBlock(templateText) {
+  const pattern = /[ \t]*<!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->[\s\S]*?<!-- ===== END SECTION 11 - DIGITAL ===== -->[^\S\r\n]*/;
+  const match = templateText.match(pattern);
+
+  if (!match) {
+    return {
+      digitalSectionBlock: '',
+      templateWithoutDigitalSection: templateText
+    };
+  }
+
+  return {
+    digitalSectionBlock: match[0],
+    templateWithoutDigitalSection: templateText.replace(pattern, '')
+  };
+}
+
+function extractMarkedBlock(text, beginMarker, endMarker) {
+  const start = text.indexOf(beginMarker);
+
+  if (start === -1) {
+    return {
+      block: '',
+      textWithoutBlock: text
+    };
+  }
+
+  const end = text.indexOf(endMarker, start);
+
+  if (end === -1) {
+    return {
+      block: '',
+      textWithoutBlock: text
+    };
+  }
+
+  const blockEnd = end + endMarker.length;
+
+  return {
+    block: text.slice(start, blockEnd),
+    textWithoutBlock: `${text.slice(0, start)}${text.slice(blockEnd)}`
+  };
+}
+
+function stripDigitalOuterWrapper(digitalSectionBlock) {
+  return digitalSectionBlock
+    .replace(/^\s*<!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->\s*/, '')
+    .replace(/^\s*<xsl:if test="notification_data\/incoming_request\/format = 'DIGITAL'">\s*/, '')
+    .replace(/\s*<!-- ===== END SECTION 11 - DIGITAL ===== -->\s*$/, '')
+    .replace(/\s*<\/xsl:if>\s*$/, '');
+}
+
+function stripDigitalArticleWrapper(articleBlock) {
+  return articleBlock
+    .replace(/^\s*<!-- ===== END SECTION 10 - PHYSICAL ===== -->\s*/, '')
+    .replace(/^\s*<!-- [=\s]*SECTION 11A - DIGITAL ARTICLE[\s\S]*?-->\s*/, '')
+    .replace(/^\s*<xsl:if test="notification_data\/metadata\/material_type = 'Article'">\s*/, '')
+    .replace(/\s*<!-- ===== END SECTION 11A - DIGITAL ARTICLE ===== -->\s*$/, '')
+    .replace(/\s*<\/xsl:if>\s*$/, '');
+}
+
+function stripDigitalChapterWrapper(chapterBlock) {
+  return chapterBlock
+    .replace(/^\s*<!-- [=\s]*SECTION 11B - DIGITAL BOOK\/CHAPTER[\s\S]*?-->\s*/, '')
+    .replace(/^\s*<xsl:if test="notification_data\/metadata\/material_type = 'Book'">\s*/, '')
+    .replace(/\s*<!-- ===== END SECTION 11B - DIGITAL BOOK\/CHAPTER ===== -->\s*$/, '')
+    .replace(/\s*<\/xsl:if>\s*$/, '');
+}
+
+function stripDigitalCopyrightWrapper(copyrightBlock) {
+  return copyrightBlock
+    .replace(/^\s*<!-- [=\s]*SECTION 11C - COPYRIGHT NOTICE[\s\S]*?-->\s*/, '')
+    .replace(/\s*<!-- ===== END SECTION 11C - COPYRIGHT NOTICE ===== -->\s*$/, '');
+}
+
+function splitDigitalInternalBarcode(innerBlock) {
+  const pattern = /(\s*<xsl:call-template name="spacer" \/>\s*<xsl:call-template name="spacer" \/>\s*<tr><td><img src="cid:resource_sharing_request_id\.png" \/><\/td><\/tr>\s*)$/;
+  const match = innerBlock.match(pattern);
+
+  if (!match) {
+    return {
+      leftContent: innerBlock.trim(),
+      barcodeBlock: ''
+    };
+  }
+
+  return {
+    leftContent: innerBlock.replace(pattern, '').trim(),
+    barcodeBlock: match[1].trim()
+  };
+}
+
+function applyDigitalSectionSplitLayout(templateText, state) {
+  if (!shouldUseDigitalSectionSplitLayout(state)) {
+    return templateText;
+  }
+
+  const { digitalSectionBlock, templateWithoutDigitalSection } = extractDigitalSectionBlock(templateText);
+
+  if (!digitalSectionBlock) {
+    return templateText;
+  }
+
+  const digitalInner = stripDigitalOuterWrapper(digitalSectionBlock);
+  const articleExtract = extractMarkedBlock(
+    digitalInner,
+    '<!-- ========================================================\r\n                         SECTION 11A - DIGITAL ARTICLE',
+    '<!-- ===== END SECTION 11A - DIGITAL ARTICLE ===== -->'
+  );
+
+  if (!articleExtract.block) {
+    return templateText;
+  }
+
+  const chapterExtract = extractMarkedBlock(
+    articleExtract.textWithoutBlock,
+    '<!-- ========================================================\r\n                         SECTION 11B - DIGITAL BOOK/CHAPTER',
+    '<!-- ===== END SECTION 11B - DIGITAL BOOK/CHAPTER ===== -->'
+  );
+
+  const copyrightExtract = extractMarkedBlock(
+    chapterExtract.textWithoutBlock,
+    '<!-- ========================================================\r\n                         SECTION 11C - COPYRIGHT NOTICE',
+    '<!-- ===== END SECTION 11C - COPYRIGHT NOTICE ===== -->'
+  );
+
+  if (!chapterExtract.block || !copyrightExtract.block) {
+    return templateText;
+  }
+
+  const articleInner = stripDigitalArticleWrapper(articleExtract.block);
+  const chapterInner = stripDigitalChapterWrapper(chapterExtract.block);
+  const copyrightInner = stripDigitalCopyrightWrapper(copyrightExtract.block).trim();
+
+  const articleSplit = splitDigitalInternalBarcode(articleInner);
+  const chapterSplit = splitDigitalInternalBarcode(chapterInner);
+
+  const buildDigitalRightBlock = (barcodeBlock) => [
+    '                      <div style="position:absolute; top:0; left:366px; width:336px !important; min-width:336px; max-width:336px; vertical-align:top; text-align:left;">',
+    '                        <table role="presentation" cellspacing="0" cellpadding="2" border="0" style="width:336px; max-width:336px; table-layout:fixed;">',
+    barcodeBlock || '',
+    '                          <tr><td style="height:12px;"></td></tr>',
+    copyrightInner,
+    '                        </table>',
+    '                      </div>'
+  ].filter(Boolean).join('\n');
+
+  const buildDigitalSplitBlock = (testExpression, leftContent, barcodeBlock) => [
+    `                    <xsl:if test="${testExpression}">`,
+    '                      <div style="position:relative; width:702px !important; max-width:702px !important; margin:0;">',
+    '                        <div style="width:336px !important; min-width:336px; max-width:336px; margin-right:366px; vertical-align:top; text-align:left;">',
+    '                          <table role="presentation" cellspacing="0" cellpadding="2" border="0" style="width:336px; max-width:336px; table-layout:fixed;">',
+    leftContent,
+    '                          </table>',
+    '                        </div>',
+    buildDigitalRightBlock(barcodeBlock),
+    '                      </div>',
+    '                    </xsl:if>'
+  ].join('\n');
+
+  const rebuiltDigitalBlock = [
+    '                  <!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->',
+    `                  <xsl:if test="notification_data/incoming_request/format = 'DIGITAL'">`,
+    buildDigitalSplitBlock("notification_data/metadata/material_type = 'Article'", articleSplit.leftContent, articleSplit.barcodeBlock),
+    '',
+    buildDigitalSplitBlock("notification_data/metadata/material_type = 'Book'", chapterSplit.leftContent, chapterSplit.barcodeBlock),
+    '                  </xsl:if>',
+    '                  <!-- ===== END SECTION 11 - DIGITAL ===== -->'
+  ].join('\n');
+
+  return templateWithoutDigitalSection.replace(
+    '                </table>\n                <!-- ===== END SECTION 09 - MAIN CONTENT TABLE ===== -->',
+    `${rebuiltDigitalBlock}\n\n                </table>\n                <!-- ===== END SECTION 09 - MAIN CONTENT TABLE ===== -->`
+  );
 }
 
 function stripPhysicalSectionWrapper(physicalSectionBlock) {
@@ -658,7 +969,7 @@ function applySectionSplitLayout(templateText, state) {
   const normalizedLabelBlock = normalizeMovedLabelBlock(labelBlock);
   const sideParts = [sideNoteBlock, normalizedLabelBlock].filter(Boolean).map((part) => part.trim()).join('\n');
   const sideColumnBlock = [
-    '<div style="width:350px; min-width:350px; max-width:350px; margin:0; text-align:left;">',
+    '<div style="width:336px; min-width:336px; max-width:336px; margin:0; text-align:left;">',
     sideParts,
     '</div>'
   ].join('\n');
@@ -668,17 +979,18 @@ function applySectionSplitLayout(templateText, state) {
   }
 
   const leftPhysicalContent = trimPhysicalContentForLeftCell(stripPhysicalSectionWrapper(templateWithoutNote));
+  const digitalSectionBlock = wrapSection08ForDigital(sectionBlock);
 
   const rebuiltPhysicalBlock = [
     `                  <xsl:if test="notification_data/incoming_request/format = 'PHYSICAL'">`,
     '                    <div style="position:relative; width:702px !important; max-width:702px !important; margin:0;">',
-    '                      <div style="width:350px !important; min-width:350px; max-width:350px; margin-right:352px; vertical-align:top; text-align:left;">',
+    '                      <div style="width:336px !important; min-width:336px; max-width:336px; margin-right:366px; vertical-align:top; text-align:left;">',
     sectionBlock.trim(),
-    '                          <table role="presentation" cellspacing="0" cellpadding="2" border="0" style="width:350px; max-width:350px; table-layout:fixed;">',
+    '                          <table role="presentation" cellspacing="0" cellpadding="2" border="0" style="width:336px; max-width:336px; table-layout:fixed;">',
     leftPhysicalContent,
     '                          </table>',
     '                      </div>',
-    '                      <div style="position:absolute; top:0; left:352px; width:350px !important; min-width:350px; max-width:350px; vertical-align:top; text-align:left;">',
+    '                      <div style="position:absolute; top:0; left:366px; width:336px !important; min-width:336px; max-width:336px; vertical-align:top; text-align:left;">',
     sideColumnBlock,
     '                      </div>',
     '                    </div>',
@@ -686,18 +998,8 @@ function applySectionSplitLayout(templateText, state) {
   ].join('\n');
 
   output = output.replace(
-    '<!-- ===== BEGIN SECTION 08 - PARTNER/POD/LOGO ===== -->',
-    `                <xsl:if test="notification_data/incoming_request/format != 'PHYSICAL'">\n<!-- ===== BEGIN SECTION 08 - PARTNER/POD/LOGO ===== -->`
-  );
-
-  output = output.replace(
-    '<!-- ===== END SECTION 08 - PARTNER/POD/LOGO ===== -->',
-    `<!-- ===== END SECTION 08 - PARTNER/POD/LOGO ===== -->\n                </xsl:if>`
-  );
-
-  output = output.replace(
     '                  <!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->',
-    `${rebuiltPhysicalBlock}\n\n                  <!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->`
+    `${digitalSectionBlock}\n\n${rebuiltPhysicalBlock}\n\n                  <!-- ===== BEGIN SECTION 11 - DIGITAL ===== -->`
   );
 
   output = output.replaceAll('@@HEADER_ADJACENT_LABEL_CELL@@', '');
@@ -716,6 +1018,7 @@ function applyTemplateReplacements(templateText, state) {
     output = applyNoteAreaChoice(output, state);
     output = applyMetadataSelection(output, state);
     output = applySectionSplitLayout(output, state);
+    output = applyDigitalSectionSplitLayout(output, state);
   }
 
   output = applyLayoutClass(output, state);
@@ -989,6 +1292,32 @@ function cleanPreviewPlaceholderLabels(root) {
   });
 }
 
+function replacePreviewBarcodeImages(root) {
+  root.querySelectorAll('img').forEach((image) => {
+    const altText = (image.getAttribute('alt') || '').trim();
+    const src = image.getAttribute('src') || '';
+    const isInternalIdBarcode = src.includes('resource_sharing_request_id');
+    const isPreviewBarcode = altText === 'group_qualifier'
+      || altText === 'externalId'
+      || src.includes('group_qualifier')
+      || src.includes('externalId')
+      || src.includes('resource_sharing_request_id');
+
+    if (!isPreviewBarcode) {
+      return;
+    }
+
+    image.setAttribute('src', isInternalIdBarcode ? PREVIEW_INTERNAL_ID_BARCODE_SRC : PREVIEW_GROUP_QUALIFIER_BARCODE_SRC);
+    image.setAttribute('alt', isInternalIdBarcode ? 'preview internal id barcode' : 'preview barcode');
+    image.setAttribute('width', '224');
+    image.setAttribute('height', '104');
+    image.style.width = '224px';
+    image.style.maxWidth = '224px';
+    image.style.height = '104px';
+    image.style.display = 'block';
+  });
+}
+
 function buildPaginatedPreview(container) {
   const sourceMarkup = container.innerHTML.trim();
   const hasSectionSplitLayout = container.classList.contains('section-split-layout');
@@ -1126,6 +1455,7 @@ async function renderTransformedOutput(xslText, state) {
 
     renderedPreview.appendChild(resultDocument);
     cleanPreviewPlaceholderLabels(renderedPreview);
+    replacePreviewBarcodeImages(renderedPreview);
     buildPaginatedPreview(renderedPreview);
   } catch (error) {
     console.error(error);
