@@ -772,6 +772,9 @@ function extractMarkedBlock(text, beginMarker, endMarker) {
     };
   }
 
+  const blockStart = text.lastIndexOf('<!--', start);
+  const actualStart = blockStart !== -1 ? blockStart : start;
+
   const end = text.indexOf(endMarker, start);
 
   if (end === -1) {
@@ -784,8 +787,8 @@ function extractMarkedBlock(text, beginMarker, endMarker) {
   const blockEnd = end + endMarker.length;
 
   return {
-    block: text.slice(start, blockEnd),
-    textWithoutBlock: `${text.slice(0, start)}${text.slice(blockEnd)}`
+    block: text.slice(actualStart, blockEnd),
+    textWithoutBlock: `${text.slice(0, actualStart)}${text.slice(blockEnd)}`
   };
 }
 
@@ -851,7 +854,7 @@ function applyDigitalSectionSplitLayout(templateText, state) {
   const digitalInner = stripDigitalOuterWrapper(digitalSectionBlock);
   const articleExtract = extractMarkedBlock(
     digitalInner,
-    '<!-- ========================================================\r\n                         SECTION 11A - DIGITAL ARTICLE',
+    'SECTION 11A - DIGITAL ARTICLE',
     '<!-- ===== END SECTION 11A - DIGITAL ARTICLE ===== -->'
   );
 
@@ -861,13 +864,13 @@ function applyDigitalSectionSplitLayout(templateText, state) {
 
   const chapterExtract = extractMarkedBlock(
     articleExtract.textWithoutBlock,
-    '<!-- ========================================================\r\n                         SECTION 11B - DIGITAL BOOK/CHAPTER',
+    'SECTION 11B - DIGITAL BOOK/CHAPTER',
     '<!-- ===== END SECTION 11B - DIGITAL BOOK/CHAPTER ===== -->'
   );
 
   const copyrightExtract = extractMarkedBlock(
     chapterExtract.textWithoutBlock,
-    '<!-- ========================================================\r\n                         SECTION 11C - COPYRIGHT NOTICE',
+    'SECTION 11C - COPYRIGHT NOTICE',
     '<!-- ===== END SECTION 11C - COPYRIGHT NOTICE ===== -->'
   );
 
