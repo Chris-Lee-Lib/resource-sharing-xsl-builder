@@ -1,0 +1,135 @@
+<notification_data>
+  <additional_id>000-000-000-1</additional_id>
+  <attachments_list />
+  <call_number_from_borrowing />
+  <destination>Check Out Desk</destination>
+  <enable_quick_print>true</enable_quick_print>
+  <external_id />
+  <group_qualifier />
+  <general_data>
+    <address_c>None;None</address_c>
+    <address_from>Email@youremail.edu (Do Not Reply)</address_from>
+    <current_date>04/03/2026</current_date>
+    <current_time>02:08:06 PM PDT</current_time>
+    <letter_name>Resource Request Slip Letter</letter_name>
+    <letter_type>FulReasourceRequestSlipLetter</letter_type>
+    <subject>Resource Request Slip</subject>
+  </general_data>
+  <incoming_request />
+  <languages>
+    <string>en</string>
+  </languages>
+  <organization_unit>
+    <name>Library Name</name>
+    <address>
+      <line1>Library Name</line1>
+      <line2>Address</line2>
+      <city>City</city>
+      <state_province>State</state_province>
+      <postal_code>Postal Code</postal_code>
+      <country_display>Yggdrasil</country_display>
+    </address>
+    <email>
+      <email>Email@youremail.edu</email>
+    </email>
+    <phone>
+      <phone>(999) 999-9999</phone>
+    </phone>
+  </organization_unit>
+  <partner_name />
+  <partner_shipping_info_list />
+  <phys_item_display>
+    <author>Gornichec, Genevieve</author>
+    <available_items>
+      <available_item>
+        <barcode>0000000000001</barcode>
+        <call_number>PS3607.O5979 W58 2021</call_number>
+        <item_policy>Book</item_policy>
+        <library_code>MCUA</library_code>
+        <library_name>Library Name</library_name>
+        <location_code>MAIN</location_code>
+        <location_name>900th Floor</location_name>
+        <material_type>BOOK</material_type>
+      </available_item>
+    </available_items>
+    <barcode />
+    <call_number>PS3607.O5979 W58 2021</call_number>
+    <edition>Second edition.</edition>
+    <imprint>New York : Oxford University Press, 2021</imprint>
+    <isbn>9780190200787</isbn>
+    <issn />
+    <location_code>MAIN</location_code>
+    <location_name>900th Floor</location_name>
+    <material_type>Book</material_type>
+    <optional_barcodes>
+      <string>00000000000002</string>
+    </optional_barcodes>
+    <owning_library_details>
+      <address1>Library Name</address1>
+      <address2>Address</address2>
+      <city>City</city>
+      <country>USA</country>
+      <name>Library Name</name>
+      <phone>(999) 999-9999</phone>
+      <postal_code>Postal Code</postal_code>
+      <state>State</state>
+    </owning_library_details>
+    <publication_date>2021</publication_date>
+    <publication_place>New York :</publication_place>
+    <publisher>Oxford University Press,</publisher>
+    <title>The Witch's Heart</title>
+    <title_abcnph>The Witch's Heart / Genevieve Gornichec.</title_abcnph>
+    <display_alt_call_numbers />
+  </phys_item_display>
+  <pod_name />
+  <request>
+    <active>true</active>
+    <assigned_unit_name>Library Name - Check Out Desk</assigned_unit_name>
+    <create_date>04/03/2026</create_date>
+    <create_time>02:08:06 PM PDT</create_time>
+    <delivery_address>Library Name - Check Out Desk</delivery_address>
+    <full_chapter>true</full_chapter>
+    <manual_description />
+    <material_type_display />
+    <needs_hold_shelf_processing>false</needs_hold_shelf_processing>
+    <note />
+    <partial_digitization>true</partial_digitization>
+    <print_transit_slip>true</print_transit_slip>
+    <request_source>Discovery</request_source>
+    <request_type>PHYSICAL_TO_DIGITIZATION</request_type>
+    <request_type_display>Patron digitization request</request_type_display>
+    <resource_sharing_request_id />
+    <resource_slip_printed>true</resource_slip_printed>
+    <selected_inventory_type>HOLDING</selected_inventory_type>
+    <system_notes />
+    <user_group>Staff</user_group>
+    <user_statistics1>Library Admin</user_statistics1>
+    <work_flow_entity>
+      <expiration_date>04/30/2026</expiration_date>
+      <step_type>PICKUP_FROM_SHELF</step_type>
+    </work_flow_entity>
+  </request>
+  <request_id>00000000000004</request_id>
+  <request_type>Patron digitization request</request_type>
+  <user_for_printing>
+    <email>thor.odinson@aru.edu</email>
+    <first_name>Thor</first_name>
+    <last_name>Odinson</last_name>
+    <middle_name />
+    <name>Odinson, Thor</name>
+    <address1>616 Bifrost Way</address1>
+    <address2 />
+    <address3 />
+    <city>Valhalla</city>
+    <country>USA</country>
+    <postal_code>00001</postal_code>
+    <state>Asgard</state>
+    <identifiers>
+      <code_value>
+        <code>Primary Identifier</code>
+        <value>00000001</value>
+      </code_value>
+    </identifiers>
+    <user_group>Staff</user_group>
+  </user_for_printing>
+</notification_data>

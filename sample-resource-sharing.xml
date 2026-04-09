@@ -1,0 +1,237 @@
+<notification_data>
+  <additional_id>000-000-000-0</additional_id>
+  <attachments_list />
+  <call_number_from_borrowing />
+  <destination>University Library</destination>
+  <enable_quick_print>true</enable_quick_print>
+  <external_id />
+  <general_data>
+    <address_c>None;None</address_c>
+    <address_c>None;None</address_c>
+    <address_from>Email@youremail.edu (Do Not Reply)</address_from>
+    <current_date>04/01/2026</current_date>
+    <current_time>10:15:22 AM PDT</current_time>
+    <letter_channel_info />
+    <letter_name>Resource Request Slip Letter</letter_name>
+    <letter_type>FulReasourceRequestSlipLetter</letter_type>
+    <subject>Resource Request Slip</subject>
+  </general_data>
+  <group_qualifier>01MCU0000001</group_qualifier>
+  <incoming_request>
+    <create_date>04/01/2026</create_date>
+    <create_date_str>04/01/2026</create_date_str>
+    <create_date_with_time_str>04/01/2026 10:15:22 AM PDT</create_date_with_time_str>
+    <expiration_date>08/28/2023</expiration_date>
+    <external_request_id>1//01MCU0000001</external_request_id>
+    <format>PHYSICAL</format>
+    <format_str>PHYSICAL</format_str>
+    <identifier>0000000000007</identifier>
+    <internal_request_id>0000000000004</internal_request_id>
+    <partner_code />
+    <partner_id>0000000000002</partner_id>
+    <partner_name>Asgard Realm University</partner_name>
+    <pod_id>0000000000000001</pod_id>
+    <requester_email>InterlibraryLoan@ARU.edu</requester_email>
+    <resource_slip_printed>false</resource_slip_printed>
+    <status>BEING_PROCESSED</status>
+    <title>The Witch's Heart</title>
+  </incoming_request>
+  <languages>
+    <string>en</string>
+  </languages>
+  <letter_params />
+  <letter_texts />
+  <loans_by_library />
+  <metadata>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;dc:record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;&lt;dc:lcc_number&gt;  2016025659&lt;/dc:lcc_number&gt;&lt;dc:rlterms_placeOfPublication&gt;New York :&lt;/dc:rlterms_placeOfPublication&gt;&lt;dc:rlterms_edition&gt;Second edition.&lt;/dc:rlterms_edition&gt;&lt;dc:title&gt;The Witch&apos;s Heart&lt;/dc:title&gt;&lt;dc:oclc_number&gt;(OCoLC)952195819&lt;/dc:oclc_number&gt;&lt;dc:source&gt;Alma&lt;/dc:source&gt;&lt;dc:identifier_isbn&gt;9780190200787&lt;/dc:identifier_isbn&gt;&lt;dc:date&gt;2021&lt;/dc:date&gt;&lt;dc:creator&gt;Gornichec, Genevieve&lt;/dc:creator&gt;&lt;dc:publisher&gt;Oxford University Press,&lt;/dc:publisher&gt;&lt;dc:rlterms_callNumberType&gt;0&lt;/dc:rlterms_callNumberType&gt;&lt;/dc:record&gt;</metadata>
+  <normalize_sum_strategy />
+  <operator_user_name>00000001</operator_user_name>
+  <organization_unit>
+    <address>
+      <city>City</city>
+      <country>USA</country>
+      <country_display>Yggdrasil</country_display>
+      <line1>Library Name</line1>
+      <line2>Address</line2>
+      <line3 />
+      <postal_code>Postal Code</postal_code>
+      <state_province>State</state_province>
+    </address>
+    <code>MCUA</code>
+    <description>Library Name</description>
+    <email>
+      <email>Email@youremail.edu</email>
+      <preferred>true</preferred>
+    </email>
+    <name>Library Name</name>
+    <phone>
+      <phone>(999) 999-9999</phone>
+      <preferred>true</preferred>
+    </phone>
+    <resource_sharing_library>true</resource_sharing_library>
+    <status>ACTIVE</status>
+  </organization_unit>
+  <partner_name>Asgard Realm University</partner_name>
+  <partner_shipping_info_list>
+    <partner_shipping_info>
+      <address1>616 Bifrost Way</address1>
+      <address2 />
+      <address3 />
+      <address4 />
+      <address5 />
+      <city>Valhalla</city>
+      <country>Yggdrasil</country>
+      <postal_code>00001</postal_code>
+      <state>Asgard</state>
+    </partner_shipping_info>
+  </partner_shipping_info_list>
+  <phys_item_display>
+    <accession_number />
+    <alt_call_number_type />
+    <attachments />
+    <author>Gornichec, Genevieve</author>
+    <available_items>
+      <available_item>
+        <barcode>00000000000002</barcode>
+        <call_number>PS3607.O5979 W58 2021</call_number>
+        <item_id>00000000000004</item_id>
+        <library_code>MCUA</library_code>
+        <library_name>Library Name</library_name>
+        <location_code>MAIN</location_code>
+        <location_name>900th Floor</location_name>
+        <material_type>BOOK</material_type>
+      </available_item>
+    </available_items>
+    <barcode>00000000000002</barcode>
+    <call_number>PS3607.O5979 W58 2021</call_number>
+    <call_number_type>0</call_number_type>
+    <display_alt_call_numbers />
+    <edition />
+    <fulfillment_note />
+    <imprint>New York : Oxford University Press, 2021</imprint>
+    <inventory_material_type>Book</inventory_material_type>
+    <isbn>0000000000007</isbn>
+    <issn />
+    <issue_level_description />
+    <item_pid>00000000000000001</item_pid>
+    <library_code>MCUA</library_code>
+    <library_name>Library Name</library_name>
+    <location_code>MAIN</location_code>
+    <location_name>900th Floor</location_name>
+    <material_type>BOOK</material_type>
+    <optional_barcodes>
+      <string>00000000000002</string>
+    </optional_barcodes>
+    <owning_library_details>
+      <address1>Library Name</address1>
+      <address2>Address</address2>
+      <address3 />
+      <address4 />
+      <address5 />
+      <city>City</city>
+      <country>USA</country>
+      <country_display>Yggdrasil</country_display>
+      <email>Email@youremail.edu</email>
+      <identifiers>
+        <code_value>
+          <code>Primary Identifier</code>
+          <value>00000001</value>
+        </code_value>
+      </identifiers>
+      <name>Library Name</name>
+      <phone>(999) 999-9999</phone>
+      <postal_code>Postal Code</postal_code>
+      <preferred_language>English</preferred_language>
+      <state>State</state>
+    </owning_library_details>
+    <owning_library_id>00000000000002</owning_library_id>
+    <owning_library_name>Library Name</owning_library_name>
+    <publication_date>2021</publication_date>
+    <publication_place>New York :</publication_place>
+    <publisher>Oxford University Press,</publisher>
+    <row_call_number>$$h PS3607.O5979 $$i W58 2021 </row_call_number>
+    <shelving_location />
+    <suppressed>false</suppressed>
+    <title>The Witch's Heart</title>
+    <title_abcnph>The Witch's Heart / Genevieve Gornichec.</title_abcnph>
+  </phys_item_display>
+  <pod_id>0000000000000001</pod_id>
+  <pod_name>California State Network</pod_name>
+  <proxy_requester />
+  <receivers>
+    <receiver>
+      <attached_to_entity_id>00000000000001</attached_to_entity_id>
+      <entity_id />
+      <entity_type />
+      <params />
+      <preferred_language />
+      <printer>
+        <code>RAPIDO</code>
+        <create_date>05/03/2022</create_date>
+        <create_date_allow_null />
+        <created_by_user />
+        <description />
+        <email />
+        <entity_action />
+        <library_id>00000000000001</library_id>
+        <library_unit_id />
+        <modification_date_allow_null />
+        <modified_by_user />
+        <name>Rapido</name>
+        <printout_queue_indicator>true</printout_queue_indicator>
+      </printer>
+      <receiver_id />
+      <receiver_type />
+      <receiver_type_class>com.exlibris.core.infra.model.HPrinter</receiver_type_class>
+    </receiver>
+  </receivers>
+  <renewals_allowed>false</renewals_allowed>
+  <request>
+    <active>true</active>
+    <assigned_unit_name>Library Name - Check Out Desk</assigned_unit_name>
+    <calculated_destination_name>Library Name - Check Out Desk</calculated_destination_name>
+    <create_date>04/01/2026</create_date>
+    <create_time>10:15:22 AM PDT</create_time>
+    <delivery_address>Library Name - Check Out Desk</delivery_address>
+    <manual_description />
+    <material_type_display>Book</material_type_display>
+    <note>Please use rush delivery via Bifrost</note>
+    <notes>Please use rush delivery via Bifrost</notes>
+    <pickup>false</pickup>
+    <previous_locations>00000000000001</previous_locations>
+    <print_transit_slip>true</print_transit_slip>
+    <request_type>RESOURCE_SHARING_PHYSICAL_SHIPMENT</request_type>
+    <request_type_display>Ship physically</request_type_display>
+    <resource_sharing_request_id>00000000000004</resource_sharing_request_id>
+    <resource_slip_printed>true</resource_slip_printed>
+    <selected_inventory_type>ITEM</selected_inventory_type>
+    <should_print_request_slip>true</should_print_request_slip>
+    <system_notes />
+    <work_flow_entity>
+      <action_date>04/01/2026</action_date>
+      <assigned_unit_id>00000000000002</assigned_unit_id>
+      <assigned_unit_type>CIRCULATION_DESK</assigned_unit_type>
+      <calculated_destination_id>00000000000002</calculated_destination_id>
+      <calculated_destination_type>CIRCULATION_DESK</calculated_destination_type>
+      <create_date>04/01/2026</create_date>
+      <expiration_date>08/28/2023</expiration_date>
+      <step_type>PICKUP_FROM_SHELF</step_type>
+    </work_flow_entity>
+  </request>
+  <request_id>00000000000004</request_id>
+  <request_type>Ship physically</request_type>
+  <send_after_commit>true</send_after_commit>
+  <sms_content />
+  <throw_exceptions>false</throw_exceptions>
+  <url_list />
+  <user_for_printing />
+  <webhook_data>
+    <fees />
+    <items />
+    <loans />
+    <outgoing_resource_sharing_requests />
+    <receivers />
+    <smss_content />
+    <user_requests />
+  </webhook_data>
+</notification_data>

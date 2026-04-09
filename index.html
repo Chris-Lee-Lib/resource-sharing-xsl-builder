@@ -41,16 +41,31 @@
             <select name="letterType">
               <option value="">Select a letter</option>
               <option value="pull-slip-letter">Pull Slip Letter (Ful Incoming Slip Letter)</option>
+              <option value="pick-from-shelf">Pick from shelf (Alma P2P Pull Slip) (Ful Resource Request Letter)</option>
             </select>
           </label>
         </div>
 
         <div class="field-grid" id="letter-specific-questions" hidden>
-          <div class="form-subsection field-wide" data-letter-question="pull-slip-letter">
+          <label class="field field-wide" data-letter-question="pick-from-shelf">
+            <span>Has your Circulation Department customized their Hold Shelf Letter (Ful Resource Request Slip Letter)?</span>
+            <select name="hasCustomHoldShelfLetter">
+              <option value="" selected>Select an option</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
+
+          <label class="field field-wide" data-letter-question="pick-from-shelf" data-dependent-question="hasCustomHoldShelfLetter" data-dependent-value="yes">
+            <span>Paste the custom Hold Shelf Letter XSL.</span>
+            <textarea name="customHoldShelfLetterXsl" rows="12" placeholder="Paste the full XSL here. The app will use only the first <html>...</html> block."></textarea>
+          </label>
+
+          <div class="form-subsection field-wide" data-letter-question="pull-slip-letter pick-from-shelf">
             <h3>Slip Header</h3>
           </div>
 
-          <label class="field field-wide" data-letter-question="pull-slip-letter">
+          <label class="field field-wide" data-letter-question="pull-slip-letter pick-from-shelf">
             <span>Do you want the request creation date added to your slip?</span>
             <select name="includeCreateDate">
               <option value="" selected>Select an option</option>
@@ -59,7 +74,7 @@
             </select>
           </label>
 
-          <label class="field field-wide" data-letter-question="pull-slip-letter" data-dependent-question="includeCreateDate" data-dependent-value="yes">
+          <label class="field field-wide" data-letter-question="pull-slip-letter pick-from-shelf" data-dependent-question="includeCreateDate" data-dependent-value="yes">
             <span>What format do you want the date to appear?</span>
             <select name="createDateFormat">
               <option value="" selected>Select an option</option>
@@ -70,7 +85,7 @@
             </select>
           </label>
 
-          <label class="field field-wide" data-letter-question="pull-slip-letter">
+          <label class="field field-wide" data-letter-question="pull-slip-letter pick-from-shelf">
             <span>Do you want to add your library logo to the Letter?</span>
             <select name="includeLogo">
               <option value="" selected>Select an option</option>
@@ -79,7 +94,7 @@
             </select>
           </label>
 
-          <label class="field field-wide" data-letter-question="pull-slip-letter" data-dependent-question="includeLogo" data-dependent-value="yes">
+          <label class="field field-wide" data-letter-question="pull-slip-letter pick-from-shelf" data-dependent-question="includeLogo" data-dependent-value="yes">
             <span>What is the URL for the logo you want printed on the slip?</span>
             <small>The URL must link directly to a PNG or JPEG image.</small>
             <input
@@ -89,6 +104,60 @@
               value=""
               placeholder="https://example.org/library-logo.png">
           </label>
+
+          <div class="form-subsection field-wide" data-letter-question="pick-from-shelf">
+            <h3>Metadata</h3>
+          </div>
+
+          <fieldset class="metadata-section field-wide" data-letter-question="pick-from-shelf">
+            <legend>Select the metadata you want on the Resource Sharing slip.</legend>
+
+            <div class="metadata-group">
+              <div class="metadata-group-header">
+                <h4>Shared Metadata</h4>
+                <button type="button" class="button primary metadata-select-all" data-metadata-group="shared">Select All</button>
+              </div>
+              <div class="metadata-option-grid">
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="title"><span>Title</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="author"><span>Author</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="publication-date"><span>Publication Date</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="volume"><span>Volume</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="issue"><span>Issue</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="pages"><span>Pages</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="publisher"><span>Publisher</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="place-of-publication"><span>Place of Publication</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="oclc-number"><span>OCLC Number</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="borrower-reference"><span>Borrower Reference</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="requester-email"><span>Requester Email</span></label>
+              </div>
+            </div>
+
+            <div class="metadata-group">
+              <div class="metadata-group-header">
+                <h4>Physical-Only Metadata</h4>
+                <button type="button" class="button primary metadata-select-all" data-metadata-group="physical">Select All</button>
+              </div>
+              <div class="metadata-option-grid">
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="edition"><span>Edition</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="isbn"><span>ISBN</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="issn"><span>ISSN</span></label>
+              </div>
+            </div>
+
+            <div class="metadata-group">
+              <div class="metadata-group-header">
+                <h4>Chapter/Article Metadata</h4>
+                <button type="button" class="button primary metadata-select-all" data-metadata-group="chapter-article">Select All</button>
+              </div>
+              <div class="metadata-option-grid">
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="chapter-title"><span>Chapter Title</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="chapter-author"><span>Chapter Author</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="chapter-number"><span>Chapter Number</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="journal-title"><span>Journal Title</span></label>
+                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="article-title"><span>Article Title</span></label>
+              </div>
+            </div>
+          </fieldset>
 
           <div class="form-subsection field-wide" data-letter-question="pull-slip-letter">
             <h3>Metadata</h3>
@@ -159,13 +228,24 @@
             <h3>Slips for Requests for Physical Items</h3>
           </div>
 
-          <label class="field field-wide" data-letter-question="pull-slip-letter">
+          <label class="field field-wide" data-letter-question="pull-slip-letter pick-from-shelf">
             <span>Do you want an area on the printed letter to communicate issues or pre-existing damage to the Borrowing Library? What format?</span>
             <select name="noteAreaType">
               <option value="" selected>Select an option</option>
               <option value="line">A line dedicated to writing a short note</option>
               <option value="checkboxes">A series of check boxes explaining the issues</option>
               <option value="none">No note area</option>
+            </select>
+          </label>
+
+          <label class="field field-wide" data-letter-question="pick-from-shelf">
+            <span>Do you want a Shipping Label, Return Label, Both Labels, or No Label on the slip?</span>
+            <select name="labelChoice">
+              <option value="" selected>Select an option</option>
+              <option value="shipping-label">Shipping Label to mail the item to the Borrowing Library</option>
+              <option value="return-label">Return Label for the Borrowing Library to use to return the item</option>
+              <option value="both-labels">Both Shipping and Return Labels</option>
+              <option value="no-label">No Label</option>
             </select>
           </label>
 
@@ -217,6 +297,8 @@
           <button type="button" class="button primary preview-sample-button is-active" data-preview-sample="book">Book</button>
           <button type="button" class="button primary preview-sample-button" data-preview-sample="book-chapter">Book Chapter</button>
           <button type="button" class="button primary preview-sample-button" data-preview-sample="article">Article</button>
+          <button type="button" class="button primary preview-sample-button" data-preview-sample="resource-sharing" hidden>Resource Sharing</button>
+          <button type="button" class="button primary preview-sample-button" data-preview-sample="hold-shelf" hidden>Hold Shelf</button>
         </div>
       </div>
       <div id="rendered-preview"></div>

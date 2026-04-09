@@ -115,6 +115,380 @@ const PREVIEW_INTERNAL_ID_BARCODE_SRC = `data:image/svg+xml;utf8,${encodeURIComp
 </svg>
 `)}`;
 
+const DEFAULT_PICK_FROM_SHELF_HOLD_SHELF_HTML = `
+	<html>
+			<xsl:if test="notification_data/languages/string">
+				<xsl:attribute name="lang">
+					<xsl:value-of select="notification_data/languages/string"/>
+				</xsl:attribute>
+			</xsl:if>
+
+		<head>
+				<title>
+					<xsl:value-of select="notification_data/general_data/subject"/>
+				</title>
+
+		<xsl:call-template name="generalStyle" />
+		</head>
+
+			<body>
+			<h1>
+				<strong>@@requested_for@@ :
+							<xsl:value-of select="notification_data/user_for_printing/name"/>
+				</strong>
+			</h1>
+
+
+				<xsl:call-template name="head" /> <!-- header.xsl -->
+
+
+
+			<div class="messageArea">
+				<div class="messageBody">
+					 <table role='presentation'  cellspacing="0" cellpadding="5" border="0">
+						<xsl:if  test="notification_data/request/selected_inventory_type='ITEM'" >
+						<tr>
+							<td><strong>@@note_item_specified_request@@.</strong></td>
+						</tr>
+						</xsl:if>
+						<xsl:if  test="notification_data/request/manual_description != ''" >
+						<tr>
+							<td><strong>@@please_note@@: </strong>@@manual_description_note@@ - <xsl:value-of select="notification_data/request/manual_description"/></td>
+						</tr>
+						</xsl:if>
+						<tr>
+							<td><strong>@@request_id@@: </strong><img src="cid:request_id_barcode.png" alt="Request Barcode"/></td>
+						</tr>
+						<xsl:if  test="notification_data/phys_item_display/barcode != ''">
+						<tr>
+							<td><strong>@@item_barcode@@: </strong><img src="cid:item_id_barcode.png" alt="Item Barcode"/></td>
+						</tr>
+						</xsl:if>
+						<xsl:if  test="notification_data/external_id != ''" >
+							<tr>
+								<td><strong>@@external_id@@: </strong><xsl:value-of select="notification_data/external_id"/></td>
+							</tr>
+						</xsl:if>
+
+						<xsl:if test="notification_data/user_for_printing/name">
+
+						<tr>
+							<td>
+						<strong>@@requested_for@@: </strong>
+							<xsl:value-of select="notification_data/user_for_printing/name"/></td>
+						</tr>
+
+						</xsl:if>
+						
+						<xsl:if test="notification_data/proxy_requester/name">
+							<tr>
+								<td><strong>@@proxy_requester@@: </strong><xsl:value-of select="notification_data/proxy_requester/name"/></td>
+							</tr>
+						</xsl:if>
+
+						<tr>
+							<td><xsl:call-template name="recordTitle" />
+							</td>
+						</tr>
+
+							<xsl:if test="notification_data/phys_item_display/isbn != ''">
+								<tr>
+								<td>@@isbn@@: <xsl:value-of select="notification_data/phys_item_display/isbn"/></td>
+								</tr>
+							</xsl:if>
+							<xsl:if test="notification_data/phys_item_display/issn != ''">
+								<tr>
+								<td>@@issn@@: <xsl:value-of select="notification_data/phys_item_display/issn"/></td>
+								</tr>
+							</xsl:if>
+							<xsl:if test="notification_data/phys_item_display/edition != ''">
+								<tr>
+								<td>@@edition@@: <xsl:value-of select="notification_data/phys_item_display/edition"/></td>
+								</tr>
+							</xsl:if>
+							<xsl:if test="notification_data/phys_item_display/imprint != ''">
+								<tr>
+								<td>@@imprint@@: <xsl:value-of select="notification_data/phys_item_display/imprint"/></td>
+								</tr>
+							</xsl:if>
+
+						<strong></strong>
+						<tr>
+							<td><h2><strong>@@location@@: </strong><xsl:value-of select="notification_data/phys_item_display/location_name"/></h2></td>
+							<xsl:if test="notification_data/phys_item_display/call_number != ''">
+								<td><h2><strong>@@call_number@@: </strong><xsl:value-of select="notification_data/phys_item_display/call_number"/></h2></td>
+							</xsl:if>
+							<xsl:if test="notification_data/phys_item_display/accession_number != ''">
+								<td><h2><strong>@@accession_number@@: </strong><xsl:value-of select="notification_data/phys_item_display/accession_number"/></h2></td>
+							</xsl:if>
+						</tr>
+						<xsl:if  test="notification_data/phys_item_display/shelving_location/string" >
+							<xsl:if  test="notification_data/request/selected_inventory_type='ITEM'" >
+							<tr>
+								<td><strong>@@shelving_location_for_item@@: </strong>
+								 <xsl:for-each select="notification_data/phys_item_display/shelving_location/string">
+									<xsl:value-of select="."/>
+								 &#160;
+								 </xsl:for-each>
+								</td>
+							</tr>
+							</xsl:if>
+							<xsl:if  test="notification_data/request/selected_inventory_type='HOLDING'" >
+							<tr>
+								<td><strong>@@shelving_locations_for_holding@@: </strong>
+								<xsl:for-each select="notification_data/phys_item_display/shelving_location/string">
+									<xsl:value-of select="."/>
+								&#160;
+								 </xsl:for-each>
+								</td>
+							</tr>
+							</xsl:if>
+							<xsl:if  test="notification_data/request/selected_inventory_type='VIRTUAL_HOLDING'" >
+							<tr>
+								<td><strong>@@shelving_locations_for_holding@@: </strong>
+								<xsl:for-each select="notification_data/phys_item_display/shelving_location/string">
+									<xsl:value-of select="."/>
+								&#160;
+								 </xsl:for-each>
+								</td>
+							</tr>
+							</xsl:if>
+						</xsl:if>
+						<xsl:if  test="notification_data/phys_item_display/display_alt_call_numbers/string" >
+							<xsl:if  test="notification_data/request/selected_inventory_type='ITEM'" >
+							<tr>
+								<td><strong>@@alt_call_number@@: </strong>
+								 <xsl:for-each select="notification_data/phys_item_display/display_alt_call_numbers/string">
+									<xsl:value-of select="."/>
+								 &#160;
+								 </xsl:for-each>
+								</td>
+							</tr>
+							</xsl:if>
+							<xsl:if  test="notification_data/request/selected_inventory_type='HOLDING'" >
+							<tr>
+								<td><strong>@@alt_call_number@@: </strong>
+								<xsl:for-each select="notification_data/phys_item_display/display_alt_call_numbers/string">
+									<xsl:value-of select="."/>
+								&#160;
+								 </xsl:for-each>
+								</td>
+							</tr>
+							</xsl:if>
+							<xsl:if  test="notification_data/request/selected_inventory_type='VIRTUAL_HOLDING'" >
+							<tr>
+								<td><strong>@@alt_call_number@@: </strong>
+								<xsl:for-each select="notification_data/phys_item_display/display_alt_call_numbers/string">
+									<xsl:value-of select="."/>
+								&#160;
+								 </xsl:for-each>
+								</td>
+							</tr>
+							</xsl:if>
+						</xsl:if>
+
+						<strong></strong>
+
+						<tr>
+							<td><strong>@@move_to_library@@: </strong><xsl:value-of select="notification_data/destination"/></td>
+						</tr>
+						<tr>
+							<td><strong>@@request_type@@: </strong><xsl:value-of select="notification_data/request_type"/></td>
+						</tr>
+
+						<xsl:if test="notification_data/request/system_notes != ''">
+							<tr>
+							<td><strong>@@system_notes@@:</strong><xsl:value-of select="notification_data/request/system_notes"/></td>
+						</tr>
+						</xsl:if>
+
+						<xsl:if test="notification_data/request/note != ''">
+							<tr>
+							<td><strong>@@request_note@@:</strong> <xsl:value-of select="notification_data/request/note"/></td>
+						</tr>
+						</xsl:if>
+
+
+					</table>
+				</div>
+			</div>
+
+
+
+
+	<xsl:call-template name="lastFooter" /> <!-- footer.xsl -->
+
+
+
+
+
+</body>
+</html>`;
+
+const PREVIEW_PICK_FROM_SHELF_INCLUDE_TEMPLATES = `
+<xsl:template name="generalStyle">
+ <style>
+ body {@@language_related_body_css@@ background-color:#fff}
+ .listing td {border-bottom: 1px solid #eee}
+ .listing tr:hover td {background-color:#eee}
+ .listing th {background-color:#f5f5f5 }
+ h4{line-height: 0.2em}
+ </style>
+</xsl:template>
+
+<xsl:template name="bodyStyleCss">
+font-family: arial; color:#333; margin:0; padding:0em; font-size:80% 
+</xsl:template>
+
+<xsl:template name="listStyleCss">
+list-style: none; margin:0 0 0 1em; padding:0
+</xsl:template>
+
+<xsl:template name="mainTableStyleCss">
+width:100%; text-align:left
+</xsl:template>
+
+<xsl:template name="headerLogoStyleCss">
+background-color:#ffffff;  width:100%;
+</xsl:template>
+
+<xsl:template name="headerTableStyleCss">
+background-color:#e9e9e9;  width:100%; height:30px; text-shadow:1px 1px 1px #fff;
+</xsl:template>
+
+<xsl:template name="footerTableStyleCss">
+width:100%; text-shadow:1px 1px 1px #333; color:#fff; margin-top:1em;  font-weight:700; line-height:2em; font-size:150%;
+</xsl:template>
+
+<xsl:template name="head">
+<table cellspacing="0" cellpadding="5" border="0">
+	<xsl:attribute name="style">
+		<xsl:call-template name="headerTableStyleCss" />
+	</xsl:attribute>
+	<tr>
+  <xsl:for-each select="notification_data/general_data">
+	 <td>
+		<h1><xsl:value-of select="letter_name"/></h1>
+	</td>
+	<td align="right">
+		<xsl:value-of select="current_date"/>
+	</td>
+  </xsl:for-each>
+</tr>
+</table>
+</xsl:template>
+
+<xsl:template name="lastFooter">
+	<table>
+	<xsl:attribute name="style">
+		<xsl:call-template name="footerTableStyleCss" />
+	</xsl:attribute>
+	<tr>
+	<xsl:for-each select="notification_data/organization_unit">
+		<xsl:attribute name="style">
+			<xsl:call-template name="listStyleCss" />
+		</xsl:attribute>
+			<td align="center"><xsl:value-of select="name"/>&#160;<xsl:value-of select="line1"/>&#160;<xsl:value-of select="line2"/>&#160;<xsl:value-of select="city"/>&#160;<xsl:value-of select="postal_code"/>&#160;<xsl:value-of select="country"/></td>
+	</xsl:for-each>
+	</tr>
+	</table>
+</xsl:template>
+
+<xsl:template name="recordTitle">
+			<div class="recordTitle">
+				<span class="spacer_after_1em"><xsl:value-of select="notification_data/phys_item_display/title"/></span>
+			</div>
+			<xsl:if test="notification_data/phys_item_display/author !=''">
+				<div class="">
+					<span class="spacer_after_1em">
+						<span class="recordAuthor">@@by@@ <xsl:value-of select="notification_data/phys_item_display/author"/></span>
+					</span>
+				</div>
+			</xsl:if>
+			<xsl:if test="notification_data/phys_item_display/issue_level_description !=''">
+				<div class="">
+					<span class="spacer_after_1em">
+						<span class="volumeIssue">@@description@@ <xsl:value-of select="notification_data/phys_item_display/issue_level_description"/></span>
+					</span>
+				</div>
+			</xsl:if>
+</xsl:template>
+
+<xsl:template name="senderReceiver">
+<table cellspacing="0" cellpadding="5" border="0" width="100%">
+	<tr>
+		<td width="50%">
+	<xsl:choose>
+		<xsl:when test="notification_data/user_for_printing">
+			<table cellspacing="0" cellpadding="5" border="0">
+		<xsl:attribute name="style">
+			<xsl:call-template name="listStyleCss" />
+		</xsl:attribute>
+			<tr><td><b><xsl:value-of select="notification_data/user_for_printing/name"/></b></td></tr>
+			<xsl:variable name="address1" select="notification_data/user_for_printing/address1"></xsl:variable>
+			<xsl:if test="$address1 != ''"><tr><td><xsl:value-of select="$address1"/></td></tr></xsl:if>
+			<xsl:variable name="address2" select="notification_data/user_for_printing/address2"></xsl:variable>
+			<xsl:if test="$address2 != ''"><tr><td><xsl:value-of select="$address2"/></td></tr></xsl:if>
+			<xsl:variable name="address3" select="notification_data/user_for_printing/address3"></xsl:variable>
+			<xsl:if test="$address3 != ''"><tr><td><xsl:value-of select="$address3"/></td></tr></xsl:if>
+			<xsl:variable name="address4" select="notification_data/user_for_printing/address4"></xsl:variable>
+			<xsl:if test="$address4 != ''"><tr><td><xsl:value-of select="$address4"/></td></tr></xsl:if>
+			<xsl:variable name="address5" select="notification_data/user_for_printing/address5"></xsl:variable>
+			<xsl:if test="$address5 != ''"><tr><td><xsl:value-of select="$address5"/></td></tr></xsl:if>
+			<tr><td><xsl:value-of select="notification_data/user_for_printing/city"/>&#160;<xsl:value-of select="notification_data/user_for_printing/postal_code"/></td></tr>
+			<tr><td><xsl:value-of select="notification_data/user_for_printing/state"/>&#160;<xsl:value-of select="notification_data/user_for_printing/country"/></td></tr>
+		</table>
+		</xsl:when>
+		<xsl:when test="notification_data/receivers/receiver/user">
+			<xsl:for-each select="notification_data/receivers/receiver/user">
+		<table>
+		<xsl:attribute name="style">
+			<xsl:call-template name="listStyleCss" />
+		</xsl:attribute>
+			<tr><td><b><xsl:value-of select="last_name"/>&#160;<xsl:value-of select="first_name"/></b></td></tr>
+			<tr><td><xsl:value-of select="user_address_list/user_address/line1"/></td></tr>
+			<tr><td><xsl:value-of select="user_address_list/user_address/line2"/></td></tr>
+			<tr><td><xsl:value-of select="user_address_list/user_address/city"/>&#160;<xsl:value-of select="user_address_list/user_address/postal_code"/></td></tr>
+			<tr><td><xsl:value-of select="user_address_list/user_address/state_province"/>&#160;<xsl:value-of select="user_address_list/user_address/country"/></td></tr>
+		</table>
+	</xsl:for-each>
+		</xsl:when>
+		<xsl:otherwise>
+		</xsl:otherwise>
+	</xsl:choose>
+		</td>
+		<td width="50%" align="right">
+			<xsl:for-each select="notification_data/organization_unit">
+		<table>
+		<xsl:attribute name="style">
+			<xsl:call-template name="listStyleCss" />
+		</xsl:attribute>
+			<tr><td><xsl:value-of select="name"/></td></tr>
+			<tr><td><xsl:value-of select="address/line1"/></td></tr>
+			<tr><td><xsl:value-of select="address/line2"/></td></tr>
+			<tr><td><xsl:value-of select="address/city"/></td></tr>
+			<tr><td><xsl:value-of select="address/postal_code"/></td></tr>
+			<tr><td><xsl:value-of select="address/country"/></td></tr>
+		</table>
+	</xsl:for-each>
+		</td>
+	</tr>
+</table>
+</xsl:template>
+
+<xsl:template name="toWhomIsConcerned">
+<table cellspacing="0" cellpadding="5" border="0">
+	<tr>
+		<td>
+			<xsl:for-each select="notification_data">
+				<h3>@@dear@@ &#160;<xsl:value-of select="receivers/receiver/user/first_name"/>&#160;<xsl:value-of select="receivers/receiver/user/last_name"/>,</h3>
+			</xsl:for-each>
+		</td>
+	</tr>
+</table>
+</xsl:template>
+`;
+
 const previewSampleDefinitions = {
   book: {
     label: 'Book',
@@ -127,7 +501,20 @@ const previewSampleDefinitions = {
   article: {
     label: 'Article',
     file: './sample-article.xml'
+  },
+  'hold-shelf': {
+    label: 'Hold Shelf',
+    file: './sample-hold-shelf.xml'
+  },
+  'resource-sharing': {
+    label: 'Resource Sharing',
+    file: './sample-resource-sharing.xml'
   }
+};
+
+const previewSamplesByLetter = {
+  'pull-slip-letter': ['book', 'book-chapter', 'article'],
+  'pick-from-shelf': ['resource-sharing', 'hold-shelf']
 };
 
 const letterDefinitions = {
@@ -140,9 +527,10 @@ const letterDefinitions = {
   },
   'pick-from-shelf': {
     code: 'B',
-    shortName: 'Pick from shelf',
+    shortName: 'Pick from shelf (Alma P2P Pull Slip)',
     almaLetter: 'Ful Resource Request Letter',
-    chunks: ['shell', 'letter-meta', 'library-header', 'request-fields', 'pickup-workflow', 'staff-contact', 'closing']
+    chunks: ['shell', 'real-template-file'],
+    templateFile: './pull-slip-request-letter.xsl'
   },
   'borrowing-receive-slip': {
     code: 'C',
@@ -246,18 +634,72 @@ const chunkCatalog = [
 
 const defaultState = readFormState();
 
+function getActiveFieldValue(fieldName, selectedLetter) {
+  const candidates = Array.from(form.querySelectorAll(`[name="${fieldName}"]`));
+
+  if (!candidates.length) {
+    return '';
+  }
+
+  const matchingCandidate = candidates.find((field) => {
+    const questionGroup = field.closest('[data-letter-question]');
+
+    if (!questionGroup) {
+      return true;
+    }
+
+    return questionAppliesToLetter(questionGroup, selectedLetter) && !questionGroup.hidden;
+  });
+
+  return (matchingCandidate || candidates[0]).value || '';
+}
+
 function readFormState() {
+  const selectedLetter = form.elements.letterType.value;
+
   return {
     libraryName: form.elements.libraryName.value.trim(),
-    letterType: form.elements.letterType.value,
+    letterType: selectedLetter,
+    hasCustomHoldShelfLetter: form.elements.hasCustomHoldShelfLetter?.value || '',
+    customHoldShelfLetterXsl: form.elements.customHoldShelfLetterXsl?.value || '',
     includeLogo: form.elements.includeLogo.value,
     logoUrl: form.elements.logoUrl.value.trim(),
-    labelChoice: form.elements.labelChoice.value,
+    labelChoice: getActiveFieldValue('labelChoice', selectedLetter),
     includeCreateDate: form.elements.includeCreateDate.value,
     createDateFormat: form.elements.createDateFormat.value,
     noteAreaType: form.elements.noteAreaType.value,
     metadataOptions: Array.from(form.querySelectorAll('input[name="metadataOptions"]:checked')).map((input) => input.value)
   };
+}
+
+function resetFormForLetterChange(nextLetterType = '') {
+  const preservedLibraryName = form.elements.libraryName.value;
+
+  Object.entries(defaultState).forEach(([key, value]) => {
+    if (key === 'libraryName' || key === 'letterType' || key === 'metadataOptions') {
+      return;
+    }
+
+    const field = form.elements[key];
+
+    if (!field) {
+      return;
+    }
+
+    field.value = value;
+  });
+
+  form.querySelectorAll('input[name="metadataOptions"]').forEach((input) => {
+    input.checked = false;
+  });
+
+  form.elements.libraryName.value = preservedLibraryName;
+  form.elements.letterType.value = nextLetterType;
+  syncLetterSpecificQuestions();
+  syncSelectedPreviewSample();
+  syncPreviewSampleButtons();
+  preview.textContent = '';
+  renderedPreview.innerHTML = '';
 }
 
 function escapeXml(value) {
@@ -280,8 +722,37 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function extractFirstHtmlFragment(xslText) {
+  if (!xslText) {
+    return '';
+  }
+
+  const match = xslText.match(/<html\b[\s\S]*?<\/html>/i);
+  return match ? match[0].trim() : '';
+}
+
+function hasValidCustomHoldShelfXsl(state) {
+  if (state.letterType !== 'pick-from-shelf' || state.hasCustomHoldShelfLetter !== 'yes') {
+    return true;
+  }
+
+  return Boolean(extractFirstHtmlFragment(state.customHoldShelfLetterXsl));
+}
+
 function getLetterDefinition(letterType) {
   return letterDefinitions[letterType] || letterDefinitions['pull-slip-letter'];
+}
+
+function getAllowedPreviewSamples(letterType) {
+  return previewSamplesByLetter[letterType] || ['book'];
+}
+
+function questionAppliesToLetter(element, selectedLetter) {
+  const letters = (element.dataset.letterQuestion || '')
+    .split(/\s+/)
+    .filter(Boolean);
+
+  return letters.includes(selectedLetter);
 }
 
 function syncLetterSpecificQuestions() {
@@ -289,12 +760,14 @@ function syncLetterSpecificQuestions() {
   const hasLetter = Boolean(selectedLetter);
   const logoUrlField = form.elements.logoUrl;
   const includeLogoField = form.elements.includeLogo;
+  const customHoldShelfLetterField = form.elements.customHoldShelfLetterXsl;
+  const hasCustomHoldShelfLetterField = form.elements.hasCustomHoldShelfLetter;
 
   letterSpecificQuestions.hidden = !hasLetter;
   letterSpecificQuestions.style.display = hasLetter ? '' : 'none';
 
   letterQuestionGroups.forEach((element) => {
-    const isMatch = element.dataset.letterQuestion === selectedLetter;
+    const isMatch = questionAppliesToLetter(element, selectedLetter);
     element.hidden = !isMatch;
     element.style.display = isMatch ? '' : 'none';
   });
@@ -303,7 +776,7 @@ function syncLetterSpecificQuestions() {
     const controllingField = form.elements[element.dataset.dependentQuestion];
     const expectedValue = element.dataset.dependentValue;
     const shouldShow = hasLetter
-      && element.dataset.letterQuestion === selectedLetter
+      && questionAppliesToLetter(element, selectedLetter)
       && controllingField
       && controllingField.value === expectedValue;
 
@@ -313,7 +786,7 @@ function syncLetterSpecificQuestions() {
 
   if (logoUrlField && includeLogoField) {
     const requiresLogoUrl = hasLetter
-      && selectedLetter === 'pull-slip-letter'
+      && ['pull-slip-letter', 'pick-from-shelf'].includes(selectedLetter)
       && includeLogoField.value === 'yes';
 
     logoUrlField.required = requiresLogoUrl;
@@ -321,6 +794,18 @@ function syncLetterSpecificQuestions() {
     if (!requiresLogoUrl) {
       logoUrlField.value = '';
     }
+  }
+
+  if (
+    customHoldShelfLetterField
+    && hasCustomHoldShelfLetterField
+    && (
+      !hasLetter
+      || selectedLetter !== 'pick-from-shelf'
+      || hasCustomHoldShelfLetterField.value !== 'yes'
+    )
+  ) {
+    customHoldShelfLetterField.value = '';
   }
 }
 
@@ -508,54 +993,55 @@ function applyLayoutClass(templateText, state) {
   return templateText.replaceAll('@@LAYOUT_CLASS@@', shouldUseSectionSplitLayout(state) ? 'section-split-layout' : '');
 }
 
+const PHYSICAL_SPLIT_ELIGIBLE_METADATA = new Set([
+  'title',
+  'author',
+  'publication-date',
+  'volume',
+  'issue',
+  'pages',
+  'publisher',
+  'place-of-publication',
+  'oclc-number',
+  'borrower-reference',
+  'request-note',
+  'requester-email',
+  'edition',
+  'isbn',
+  'shelving-location-for-item'
+]);
+
+const DIGITAL_SPLIT_ELIGIBLE_METADATA = new Set([
+  'title',
+  'author',
+  'publication-date',
+  'volume',
+  'issue',
+  'pages',
+  'publisher',
+  'place-of-publication',
+  'oclc-number',
+  'borrower-reference',
+  'request-note',
+  'journal-title',
+  'article-title',
+  'issn',
+  'chapter-number',
+  'chapter-title',
+  'chapter-author'
+]);
+
 function shouldUseSectionSplitLayout(state) {
-  const splitEligibleMetadata = new Set([
-    'title',
-    'author',
-    'publication-date',
-    'volume',
-    'issue',
-    'pages',
-    'publisher',
-    'place-of-publication',
-    'oclc-number',
-    'borrower-reference',
-    'request-note',
-    'requester-email',
-    'edition',
-    'isbn',
-    'shelving-location-for-item'
-  ]);
-  const metadataCount = (state.metadataOptions || []).filter((option) => splitEligibleMetadata.has(option)).length;
+  const metadataCount = (state.metadataOptions || []).filter((option) => PHYSICAL_SPLIT_ELIGIBLE_METADATA.has(option)).length;
   const hasCheckboxConditionReport = state.noteAreaType === 'checkboxes';
-  return state.letterType === 'pull-slip-letter'
+  return ['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)
     && state.labelChoice !== ''
     && state.labelChoice !== 'no-label'
     && (state.labelChoice === 'both-labels' || metadataCount >= 8 || hasCheckboxConditionReport);
 }
 
 function shouldUseDigitalSectionSplitLayout(state) {
-  const digitalSplitEligibleMetadata = new Set([
-    'title',
-    'author',
-    'publication-date',
-    'volume',
-    'issue',
-    'pages',
-    'publisher',
-    'place-of-publication',
-    'oclc-number',
-    'borrower-reference',
-    'request-note',
-    'journal-title',
-    'article-title',
-    'issn',
-    'chapter-number',
-    'chapter-title',
-    'chapter-author'
-  ]);
-
-  const metadataCount = (state.metadataOptions || []).filter((option) => digitalSplitEligibleMetadata.has(option)).length;
+  const metadataCount = (state.metadataOptions || []).filter((option) => DIGITAL_SPLIT_ELIGIBLE_METADATA.has(option)).length;
 
   return state.letterType === 'pull-slip-letter' && metadataCount > 5;
 }
@@ -947,6 +1433,17 @@ function trimPhysicalContentForLeftCell(innerPhysicalContent) {
   return output.trim();
 }
 
+function stripOuterPhysicalTableForPickFromShelf(leftPhysicalContent, state) {
+  if (state.letterType !== 'pick-from-shelf') {
+    return leftPhysicalContent;
+  }
+
+  return leftPhysicalContent
+    .replace(/^\s*<table\b[^>]*>\s*/i, '')
+    .replace(/\s*<\/table>\s*$/i, '')
+    .trim();
+}
+
 function extractPhysicalLabelBlock(templateText) {
   const blockPatterns = [
     /[ \t]*<!-- [=\s]*\r?\n[ \t]*SECTION 10B [â€”-] SHIPPING LABEL\r?\n[ \t]*NOTE: Addresses MUST remain full; do not truncate\.\r?\n[ \t]*[=\s]*-->[\s\S]*?<!-- ===== END SECTION 10B [â€”-] SHIPPING LABEL ===== -->[^\S\r\n]*/,
@@ -1028,7 +1525,10 @@ function applySectionSplitLayout(templateText, state) {
     return output.replaceAll('@@HEADER_ADJACENT_LABEL_CELL@@', '');
   }
 
-  const leftPhysicalContent = trimPhysicalContentForLeftCell(stripPhysicalSectionWrapper(templateWithoutNote));
+  const leftPhysicalContent = stripOuterPhysicalTableForPickFromShelf(
+    trimPhysicalContentForLeftCell(stripPhysicalSectionWrapper(templateWithoutNote)),
+    state
+  );
   const digitalSectionBlock = wrapSection08ForDigital(sectionBlock);
 
   const rebuiltPhysicalBlock = [
@@ -1061,13 +1561,43 @@ function applyTemplateReplacements(templateText, state) {
   const logoUrl = state.includeLogo === 'yes' ? state.logoUrl : '';
   let output = templateText.replaceAll('@@LOGO_URL@@', logoUrl || '');
 
-  if (state.letterType === 'pull-slip-letter') {
-    output = applySelectedLabelChoice(output, state);
+  if (['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
     output = applyCreateDateChoice(output, state);
     output = applyCreateDateFormat(output, state);
-    output = applyNoteAreaChoice(output, state);
+  }
+
+  if (state.letterType === 'pick-from-shelf') {
+    let localCircHtml = '';
+
+    if (state.hasCustomHoldShelfLetter === 'no') {
+      localCircHtml = DEFAULT_PICK_FROM_SHELF_HOLD_SHELF_HTML;
+    } else if (state.hasCustomHoldShelfLetter === 'yes') {
+      localCircHtml = extractFirstHtmlFragment(state.customHoldShelfLetterXsl);
+    }
+
+    output = output.replace(
+      /<!-- Start Add Your Local Circ Customizations Here Starting with <html> -->[\s\S]*?<!-- End Local Circ Customizations ending with <\/html> -->/,
+      `<!-- Start Add Your Local Circ Customizations Here Starting with <html> --> \n\n${localCircHtml}\n\n<!-- End Local Circ Customizations ending with </html> -->`
+    );
+  }
+
+  if (['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
     output = applyMetadataSelection(output, state);
+  }
+
+  if (['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
+    output = applyNoteAreaChoice(output, state);
+  }
+
+  if (['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
+    output = applySelectedLabelChoice(output, state);
+  }
+
+  if (['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
     output = applySectionSplitLayout(output, state);
+  }
+
+  if (state.letterType === 'pull-slip-letter') {
     output = applyDigitalSectionSplitLayout(output, state);
   }
 
@@ -1080,6 +1610,20 @@ function normalizeXmlForParsing(text) {
   return text
     .replace(/^\uFEFF/, '')
     .replace(/^\s+<\?xml/, '<?xml');
+}
+
+function buildPreviewSafeXsl(xslText, state) {
+  if (state.letterType !== 'pick-from-shelf') {
+    return xslText;
+  }
+
+  let output = xslText.replace(/<xsl:include href="[^"]+"\s*\/>\s*/g, '');
+
+  if (!output.includes('<xsl:template name="generalStyle">')) {
+    output = output.replace('<xsl:template match="/">', `${PREVIEW_PICK_FROM_SHELF_INCLUDE_TEMPLATES}\n<xsl:template match="/">`);
+  }
+
+  return output;
 }
 
 function buildLetterMetaChunk(state, definition) {
@@ -1237,11 +1781,32 @@ async function getTemplateText(state) {
 }
 
 function syncPreviewSampleButtons() {
+  const allowedSamples = new Set(getAllowedPreviewSamples(form.elements.letterType.value));
+
   previewSampleButtons.forEach((button) => {
+    const sampleType = button.dataset.previewSample || '';
+    const isAllowed = allowedSamples.has(sampleType);
+
+    button.hidden = !isAllowed;
+
+    if (!isAllowed) {
+      button.classList.remove('is-active');
+      button.setAttribute('aria-pressed', 'false');
+      return;
+    }
+
     const isActive = button.dataset.previewSample === selectedPreviewSample;
     button.classList.toggle('is-active', isActive);
     button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
+}
+
+function syncSelectedPreviewSample() {
+  const allowedSamples = getAllowedPreviewSamples(form.elements.letterType.value);
+
+  if (!allowedSamples.includes(selectedPreviewSample)) {
+    selectedPreviewSample = allowedSamples[0] || 'book';
+  }
 }
 
 async function getSampleXml(sampleType = selectedPreviewSample) {
@@ -1311,6 +1876,159 @@ function applyCurrentDateToPreviewXml(xmlText) {
   });
 
   return new XMLSerializer().serializeToString(xmlDoc);
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getXmlValue(xmlDoc, selector) {
+  return xmlDoc.querySelector(selector)?.textContent?.trim() || '';
+}
+
+function formatPreviewCreateDate(dateText, format) {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dateText || '');
+
+  if (!match) {
+    return dateText || '';
+  }
+
+  const [, month, day, year] = match;
+  const monthIndex = Number(month) - 1;
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const monthName = monthNames[monthIndex] || month;
+
+  if (format === 'numerical-europe') {
+    return `${day}/${month}/${year}`;
+  }
+
+  if (format === 'readable') {
+    return `${monthName} ${Number(day)}, ${year}`;
+  }
+
+  if (format === 'readable-europe') {
+    return `${Number(day)} ${monthName} ${year}`;
+  }
+
+  return `${month}/${day}/${year}`;
+}
+
+function buildPickFromShelfFallbackPreview(xmlText, state) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(normalizeXmlForParsing(xmlText), 'application/xml');
+
+  if (xmlDoc.querySelector('parsererror')) {
+    return '';
+  }
+
+  const isHoldShelf = getXmlValue(xmlDoc, 'notification_data > group_qualifier') === '';
+  const title = getXmlValue(xmlDoc, 'notification_data > phys_item_display > title')
+    || getXmlValue(xmlDoc, 'notification_data > incoming_request > title');
+  const author = getXmlValue(xmlDoc, 'notification_data > phys_item_display > author');
+  const currentDate = getXmlValue(xmlDoc, 'notification_data > general_data > current_date');
+  const letterName = getXmlValue(xmlDoc, 'notification_data > general_data > letter_name');
+  const requesterName = getXmlValue(xmlDoc, 'notification_data > user_for_printing > name');
+  const requesterId = getXmlValue(xmlDoc, 'notification_data > user_for_printing > identifiers > code_value > value');
+  const additionalId = getXmlValue(xmlDoc, 'notification_data > additional_id');
+  const partnerName = getXmlValue(xmlDoc, 'notification_data > partner_name');
+  const podName = getXmlValue(xmlDoc, 'notification_data > pod_name');
+  const requesterEmail = getXmlValue(xmlDoc, 'notification_data > incoming_request > requester_email');
+  const groupQualifier = getXmlValue(xmlDoc, 'notification_data > group_qualifier');
+  const incomingCreateDate = getXmlValue(xmlDoc, 'notification_data > incoming_request > create_date');
+  const locationName = getXmlValue(xmlDoc, 'notification_data > phys_item_display > location_name');
+  const callNumber = getXmlValue(xmlDoc, 'notification_data > phys_item_display > call_number');
+  const barcode = getXmlValue(xmlDoc, 'notification_data > phys_item_display > barcode');
+  const isbn = getXmlValue(xmlDoc, 'notification_data > phys_item_display > isbn');
+  const edition = getXmlValue(xmlDoc, 'notification_data > phys_item_display > edition');
+  const imprint = getXmlValue(xmlDoc, 'notification_data > phys_item_display > imprint');
+  const requestType = getXmlValue(xmlDoc, 'notification_data > request_type')
+    || getXmlValue(xmlDoc, 'notification_data > request > request_type_display')
+    || getXmlValue(xmlDoc, 'notification_data > request > request_type');
+  const note = getXmlValue(xmlDoc, 'notification_data > request > note');
+  const systemNotes = getXmlValue(xmlDoc, 'notification_data > request > system_notes');
+  const destination = getXmlValue(xmlDoc, 'notification_data > destination');
+  const expirationDate = getXmlValue(xmlDoc, 'notification_data > request > work_flow_entity > expiration_date');
+  const formattedCreateDate = formatPreviewCreateDate(incomingCreateDate, state.createDateFormat || 'numerical');
+  const logoUrl = state.includeLogo === 'yes' ? state.logoUrl : '';
+
+  if (isHoldShelf) {
+    const safeRequesterName = requesterName || '(no patron name in sample)';
+
+    return `
+      <div class="messageArea">
+        <h1><strong>Requested For: ${escapeHtml(safeRequesterName)}</strong></h1>
+        <table cellspacing="0" cellpadding="5" border="0" style="background-color:#e9e9e9; width:100%; height:30px;">
+          <tr>
+            <td><h1>${escapeHtml(letterName)}</h1></td>
+            <td align="right">${escapeHtml(currentDate)}</td>
+          </tr>
+        </table>
+        <div class="messageBody">
+          <table role="presentation" cellspacing="0" cellpadding="5" border="0">
+            ${barcode ? `<tr><td><strong>Item Barcode: </strong><img src="cid:item_id_barcode.png" alt="Item Barcode" /></td></tr>` : ''}
+            <tr><td><strong>Title: </strong>${escapeHtml(title)}</td></tr>
+            ${author ? `<tr><td><strong>By: </strong>${escapeHtml(author)}</td></tr>` : ''}
+            ${isbn ? `<tr><td><strong>ISBN: </strong>${escapeHtml(isbn)}</td></tr>` : ''}
+            ${edition ? `<tr><td><strong>Edition: </strong>${escapeHtml(edition)}</td></tr>` : ''}
+            ${imprint ? `<tr><td><strong>Imprint: </strong>${escapeHtml(imprint)}</td></tr>` : ''}
+            <tr><td><h2><strong>Location: </strong>${escapeHtml(locationName)}</h2></td>${callNumber ? `<td><h2><strong>Call Number: </strong>${escapeHtml(callNumber)}</h2></td>` : ''}</tr>
+            <tr><td><strong>Move To Library: </strong>${escapeHtml(destination)}</td></tr>
+            <tr><td><strong>Request Type: </strong>${escapeHtml(requestType)}</td></tr>
+            ${systemNotes ? `<tr><td><strong>System Notes:</strong> ${escapeHtml(systemNotes)}</td></tr>` : ''}
+            ${note ? `<tr><td><strong>Request Note:</strong> ${escapeHtml(note)}</td></tr>` : ''}
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="messageArea">
+      <div class="messageBody">
+        <table border="0" cellspacing="0" cellpadding="0" style="width:350px; max-width:350px; table-layout:fixed;">
+          ${partnerName ? `<tr><td style="font-size:14pt; width:350px;"><strong>${escapeHtml(partnerName)}</strong></td></tr>` : ''}
+          ${podName ? `<tr><td style="width:350px;"><b>Pod:&nbsp;</b>${escapeHtml(podName)}</td></tr>` : ''}
+          ${requesterEmail ? `<tr><td style="width:350px;"><b>Requester Email:</b> ${escapeHtml(requesterEmail)}</td></tr>` : ''}
+          ${state.includeCreateDate === 'no' || !formattedCreateDate ? '' : `<tr><td style="width:350px;"><b>Date:&nbsp;</b>${escapeHtml(formattedCreateDate)}</td></tr>`}
+        </table>
+        ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="Library Logo" style="display:block; margin:12px auto; max-height:100px; max-width:350px;" />` : ''}
+        <table role="presentation" cellspacing="0" cellpadding="2" border="0" style="width:350px; max-width:350px; table-layout:fixed;">
+          <tr>
+            <td style="width:350px;">
+              <div class="emphBox" style="border:2px solid #000; padding:6px;">
+                <div><b>Location:&nbsp;</b><span class="locCallValue">${escapeHtml(locationName)}</span></div>
+                <div><b>Call Number:&nbsp;</b><b class="locCallValue">${escapeHtml(callNumber)}</b></div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table role="presentation" cellspacing="0" cellpadding="5" border="0">
+          ${groupQualifier ? `<tr><td><img src="cid:group_qualifier.png" alt="group_qualifier" /></td></tr>` : ''}
+          <tr><td><div class="recordTitle"><span class="spacer_after_1em">${escapeHtml(title)}</span></div>${author ? `<div><span class="spacer_after_1em"><span class="recordAuthor">By ${escapeHtml(author)}</span></span></div>` : ''}</td></tr>
+          <tr><td><b>Due Date:</b> ${escapeHtml(expirationDate)}</td></tr>
+          ${systemNotes ? `<tr><td><strong>System Notes:</strong> ${escapeHtml(systemNotes)}</td></tr>` : ''}
+          ${note ? `<tr><td><strong>Request Note:</strong> ${escapeHtml(note)}</td></tr>` : ''}
+          ${barcode ? `<tr><td><img src="cid:item_id_barcode.png" alt="Item Barcode" /></td></tr>` : ''}
+          <tr><td><font color="red">NO RENEWALS</font></td></tr>
+          <tr><td><b>Item Condition Report</b></td></tr>
+        </table>
+        <table cellspacing="0" cellpadding="5" border="1">
+          <tr><td><b>__Binding Issues</b></td><td><b>__Writing/Highlighting</b></td></tr>
+          <tr><td><b>__Cover/Spine Issues</b></td><td><b>__Liquid Damage/Stained</b></td></tr>
+          <tr><td><b>__Other (describe below)</b></td><td><b>__Missing CD/DVD</b></td></tr>
+        </table>
+        <h1><font color="red">Do Not Remove Strap</font></h1>
+      </div>
+    </div>
+  `;
 }
 
 function formatPreviewPlaceholderLabel(token) {
@@ -1492,7 +2210,8 @@ async function renderTransformedOutput(xslText, state) {
     xmlText = applyCurrentDateToPreviewXml(xmlText);
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(normalizeXmlForParsing(xmlText), 'application/xml');
-    const xslDoc = parser.parseFromString(normalizeXmlForParsing(xslText), 'application/xml');
+    const previewXslText = buildPreviewSafeXsl(xslText, state);
+    const xslDoc = parser.parseFromString(normalizeXmlForParsing(previewXslText), 'application/xml');
 
     if (xmlDoc.querySelector('parsererror') || xslDoc.querySelector('parsererror')) {
       renderedPreview.textContent = 'The sample XML or generated XSL could not be parsed for preview.';
@@ -1504,11 +2223,33 @@ async function renderTransformedOutput(xslText, state) {
     const resultDocument = processor.transformToFragment(xmlDoc, document);
 
     renderedPreview.appendChild(resultDocument);
+
+    if (state.letterType === 'pick-from-shelf' && !renderedPreview.textContent.trim() && !renderedPreview.querySelector('*')) {
+      const fallbackMarkup = buildPickFromShelfFallbackPreview(xmlText, state);
+
+      if (fallbackMarkup) {
+        renderedPreview.innerHTML = fallbackMarkup;
+      }
+    }
+
     cleanPreviewPlaceholderLabels(renderedPreview);
     replacePreviewBarcodeImages(renderedPreview);
     buildPaginatedPreview(renderedPreview);
   } catch (error) {
     console.error(error);
+    if (state.letterType === 'pick-from-shelf') {
+      const xmlText = applyCurrentDateToPreviewXml(applyLibraryNameToPreviewXml(await getSampleXml(selectedPreviewSample), state));
+      const fallbackMarkup = buildPickFromShelfFallbackPreview(xmlText, state);
+
+      if (fallbackMarkup) {
+        renderedPreview.innerHTML = fallbackMarkup;
+        cleanPreviewPlaceholderLabels(renderedPreview);
+        replacePreviewBarcodeImages(renderedPreview);
+        buildPaginatedPreview(renderedPreview);
+        return;
+      }
+    }
+
     renderedPreview.textContent = `${previewSampleDefinitions[selectedPreviewSample]?.label || 'This'} sample preview is not available yet.`;
   }
 }
@@ -1519,6 +2260,11 @@ async function render() {
   if (!state.letterType) {
     preview.textContent = '';
     renderedPreview.innerHTML = '';
+    return;
+  }
+
+  if (!hasValidCustomHoldShelfXsl(state)) {
+    showToast('Custom Hold Shelf XSL is Invalid', 'error');
     return;
   }
 
@@ -1544,12 +2290,14 @@ form.addEventListener('submit', (event) => {
 });
 
 form.elements.letterType.addEventListener('change', () => {
-  syncLetterSpecificQuestions();
-  preview.textContent = '';
-  renderedPreview.innerHTML = '';
+  resetFormForLetterChange(form.elements.letterType.value);
 });
 
 form.elements.includeCreateDate.addEventListener('change', () => {
+  syncLetterSpecificQuestions();
+});
+
+form.elements.hasCustomHoldShelfLetter.addEventListener('change', () => {
   syncLetterSpecificQuestions();
 });
 
@@ -1611,10 +2359,13 @@ resetButton.addEventListener('click', () => {
     });
 
     syncLetterSpecificQuestions();
+    syncSelectedPreviewSample();
+    syncPreviewSampleButtons();
     preview.textContent = '';
     renderedPreview.innerHTML = '';
   });
 });
 
 syncLetterSpecificQuestions();
+syncSelectedPreviewSample();
 syncPreviewSampleButtons();

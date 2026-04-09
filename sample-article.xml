@@ -4,7 +4,7 @@
 <borrowing_library_address>
 <city>Valhalla</city>
 <country>USA</country>
-<country_display>United States</country_display>
+<country_display>Yggdrasil</country_display>
 <create_date>04/03/2026</create_date>
 <create_date_allow_null/>
 <created_by_user/>
@@ -32,7 +32,7 @@
 <general_data>
 <address_c>None;None</address_c>
 <address_c>None;None</address_c>
-<address_from>WSL-Circulation@csub.edu (Do Not Reply)</address_from>
+<address_from>Email@youremail.edu (Do Not Reply)</address_from>
 <current_date>04/03/2026</current_date>
 <current_time>02:08:06 PM PDT</current_time>
 <letter_channel_info/>
@@ -330,7 +330,7 @@
 <entity_action/>
 <library_id/>
 <library_unit_id/>
-<line1>California State University, Bakersfield</line1>
+<line1>Library Name</line1>
 <line2>Address</line2>
 <line3/>
 <line4/>
@@ -354,7 +354,7 @@
 <automatically_locate_resource>false</automatically_locate_resource>
 <bibliographic_titles/>
 <cancel_request_on_locate_failure>false</cancel_request_on_locate_failure>
-<code>01CALS_UBA</code>
+<code>01MCU_ASG</code>
 <code_rfid/>
 <country/>
 <create_date/>
@@ -366,7 +366,7 @@
 <default_move_loctaion_id/>
 <default_pickup_loctaion_id/>
 <default_printer/>
-<description>California State University, Bakersfield</description>
+<description>Library Name</description>
 <digital_objects/>
 <digital_storage_size/>
 <disable_call_number_calculation>false</disable_call_number_calculation>
@@ -400,7 +400,7 @@
 <inactive_physical_lending/>
 <isil_code/>
 <itemless_library/>
-<leader_institution_id>2901</leader_institution_id>
+<leader_institution_id>0001</leader_institution_id>
 <library_id/>
 <library_unit_id/>
 <modification_date_allow_null/>
@@ -408,16 +408,16 @@
 <name>900th Floor</name>
 <named_users/>
 <org_scope>
-<customer_id>2900</customer_id>
-<institution_id>2918</institution_id>
+<customer_id>0001</customer_id>
+<institution_id>0002</institution_id>
 <library_id/>
 <library_unit_id/>
 </org_scope>
-<organization_id>2918</organization_id>
-<organization_path>2900.2918</organization_path>
+<organization_id>0002</organization_id>
+<organization_path>0001.0002</organization_path>
 <organization_type>INSTITUTION</organization_type>
-<parent_org_id>2900</parent_org_id>
-<path>01CALS.01CALS_UBA</path>
+<parent_org_id>0001</parent_org_id>
+<path>01MCU.01MCU_ASG</path>
 <personal_delivery_by_other_libraries>false</personal_delivery_by_other_libraries>
 <phone>
 <create_date>11/04/2016</create_date>
@@ -431,7 +431,7 @@
 <modification_date_allow_null/>
 <modified_by_user/>
 <originating_id/>
-<phone>(661) 654-3172</phone>
+<phone>(999) 999-9999</phone>
 <preferred>true</preferred>
 <preferred_phone/>
 <preferred_sms/>
@@ -455,7 +455,7 @@
 <temp_inactive_borrowing>false</temp_inactive_borrowing>
 <temp_inactive_lending>false</temp_inactive_lending>
 <unique_ejournal_titles/>
-<url_mapping_prefix>csu-bakersfield</url_mapping_prefix>
+<url_mapping_prefix>Asgard-Realm-University</url_mapping_prefix>
 </organization_unit>
 <partner_code>Asgard Realm University</partner_code>
 <partner_integration_type>NGRS</partner_integration_type>
@@ -466,7 +466,7 @@
 <pod_name>9 Realms Pod</pod_name>
 <receivers>
 <receiver>
-<attached_to_entity_id>8863807650002918</attached_to_entity_id>
+<attached_to_entity_id>0000000000000001</attached_to_entity_id>
 <entity_id/>
 <entity_type/>
 <params/>
@@ -479,7 +479,7 @@
 <description/>
 <email/>
 <entity_action/>
-<library_id>13699140002918</library_id>
+<library_id>0000000000000001</library_id>
 <library_unit_id/>
 <modification_date_allow_null/>
 <modified_by_user/>
