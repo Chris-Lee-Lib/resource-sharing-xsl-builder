@@ -692,6 +692,7 @@ function readFormState() {
     includeCustomMessage: getActiveFieldValue('includeCustomMessage', selectedLetter),
     customMessageText: form.elements.customMessageText?.value || '',
     digitalBarcodesAtBottom: getActiveFieldValue('digitalBarcodesAtBottom', selectedLetter),
+    removeDigitalLogo: getActiveFieldValue('removeDigitalLogo', selectedLetter),
     includeAccessibilityStatement: getActiveFieldValue('includeAccessibilityStatement', selectedLetter),
     accessibilityStatementMode: getActiveFieldValue('accessibilityStatementMode', selectedLetter),
     accessibilityContact: form.elements.accessibilityContact?.value || '',
@@ -2009,6 +2010,33 @@ function applyDigitalBarcodePlacementChoice(templateText, state) {
   return output;
 }
 
+function applyDigitalLogoChoice(templateText, state) {
+  if (state.letterType !== 'pull-slip-letter') {
+    return templateText;
+  }
+
+  const pattern = /[ \t]*<!-- BEGIN OPTIONAL DIGITAL LOGO -->[\s\S]*?<!-- END OPTIONAL DIGITAL LOGO -->[^\S\r\n]*/;
+
+  if (state.removeDigitalLogo !== 'yes') {
+    return templateText.replace(
+      pattern,
+      '                <!-- BEGIN OPTIONAL DIGITAL LOGO -->\n                <!-- Logo for all printouts -->\n                <xsl:call-template name="print-library-logo" />\n                <!-- END OPTIONAL DIGITAL LOGO -->\n'
+    );
+  }
+
+  return templateText.replace(
+    pattern,
+    [
+      '                <!-- BEGIN OPTIONAL DIGITAL LOGO -->',
+      '                <xsl:if test="notification_data/incoming_request/format = \'PHYSICAL\'">',
+      '                  <!-- Logo for physical printouts only -->',
+      '                  <xsl:call-template name="print-library-logo" />',
+      '                </xsl:if>',
+      '                <!-- END OPTIONAL DIGITAL LOGO -->'
+    ].join('\n')
+  );
+}
+
 function applyDigitalSectionSplitLayout(templateText, state) {
   if (!shouldUseDigitalSectionSplitLayout(state)) {
     return templateText;
@@ -2310,6 +2338,7 @@ function applyTemplateReplacements(templateText, state) {
     }
 
   if (state.letterType === 'pull-slip-letter') {
+    output = applyDigitalLogoChoice(output, state);
     output = applyDigitalBarcodePlacementChoice(output, state);
     output = applyAccessibilityStatementChoice(output, state);
     output = applyCopyrightStatementChoice(output, state);

@@ -467,8 +467,10 @@
                   <!-- END OPTIONAL CREATE DATE -->
                 </table>
 
+                <!-- BEGIN OPTIONAL DIGITAL LOGO -->
                 <!-- Logo for all printouts -->
                 <xsl:call-template name="print-library-logo" />
+                <!-- END OPTIONAL DIGITAL LOGO -->
 
                 <table role="presentation" cellspacing="0" cellpadding="2" border="0" style="width:350px; max-width:350px; table-layout:fixed;">
                   <tr>
