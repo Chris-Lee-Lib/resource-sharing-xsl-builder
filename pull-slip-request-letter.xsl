@@ -122,7 +122,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                                  </td>
                               </tr>
                            </xsl:if>
-                           <!-- BEGIN METADATA: requester-email -->
+                           <!-- BEGIN OPTIONAL PARTNER EMAIL -->
                            <xsl:if test="normalize-space(notification_data/incoming_request/requester_email) != ''">
                               <tr>
                                  <td style="width:350px;">
@@ -132,7 +132,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                                  </td>
                               </tr>
                            </xsl:if>
-                           <!-- END METADATA: requester-email -->
+                           <!-- END OPTIONAL PARTNER EMAIL -->
                            <!-- BEGIN OPTIONAL CREATE DATE -->
                            <xsl:if test="normalize-space(notification_data/incoming_request/create_date) != ''">
                               <tr>

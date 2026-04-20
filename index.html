@@ -80,6 +80,15 @@
             <h3>Slip Header</h3>
           </div>
 
+          <label class="field field-wide" data-letter-question="pull-slip-letter pick-from-shelf">
+            <span>Do you want the partners email visible?</span>
+            <select name="includePartnerEmail">
+              <option value="" selected>Select an option</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
+
           <label class="field field-wide" data-letter-question="pull-slip-letter pick-from-shelf borrowing-receive-slip">
             <span>Do you want the request creation date added to your slip?</span>
             <select name="includeCreateDate">
@@ -180,7 +189,6 @@
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="place-of-publication"><span>Place of Publication</span></label>
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="oclc-number"><span>OCLC Number</span></label>
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="borrower-reference"><span>Borrower Reference</span></label>
-                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="requester-email"><span>Requester Email</span></label>
               </div>
             </div>
 
@@ -222,7 +230,6 @@
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="oclc-number"><span>OCLC Number</span></label>
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="borrower-reference"><span>Borrower Reference</span></label>
                 <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="request-note"><span>Request Note</span></label>
-                <label class="metadata-option"><input type="checkbox" name="metadataOptions" value="requester-email"><span>Requester Email</span></label>
               </div>
             </div>
 
@@ -396,6 +403,20 @@ One of these specified conditions is that the photocopy or reproduction is not t
 If a user makes a request for, or later uses, a photocopy or reproduction for purposes in excess of "fair use," that user may be liable for copyright infringement.
 This institution reserves the right to refuse to accept a copying order, if, in its judgment, fulfillment of the order would involve violation of copyright law.</textarea>
           </label>
+
+          <div class="form-subsection field-wide" data-letter-question="pull-slip-letter">
+            <h3>Library Groups</h3>
+          </div>
+
+          <label class="field field-wide" data-letter-question="pull-slip-letter">
+            <span>Some libraries, consortiums, and other groups have specific configurations they have requested get added to this list that will apply to their libraries. Please select a library group if you are part of that group.</span>
+            <select name="libraryGroup">
+              <option value="" selected>Select an option</option>
+              <option value="not-applicable">Not Applicable to my Library</option>
+              <option value="california-state-university">California State University</option>
+            </select>
+          </label>
+
         </div>
 
         <div class="actions">
@@ -422,6 +443,7 @@ This institution reserves the right to refuse to accept a copying order, if, in 
         </div>
       </div>
       <pre id="xsl-preview" aria-label="Generated XSL output" tabindex="0"></pre>
+      <p id="xsl-line-count" class="xsl-line-count" aria-live="polite">Line count: 0</p>
       <p class="scroll-note">↓ Scroll down to the next section. ↓</p>
     </section>
 
@@ -432,6 +454,7 @@ This institution reserves the right to refuse to accept a copying order, if, in 
         <p>This Letter generates different slips based on if the request is for a physical item like a Book or a digital item like a Book Chapter or Article. Use the below options to switch the XML from Book, Book Chapter, and Article to see the various views.</p>
         <div class="preview-actions preview-sample-actions" role="group" aria-label="Preview sample type">
           <button type="button" class="button primary preview-sample-button is-active" data-preview-sample="book" aria-label="Preview Book XML">Book</button>
+          <button type="button" class="button primary preview-sample-button" data-preview-sample="book-courier" aria-label="Preview Book Courier XML" hidden>Book (Courier)</button>
           <button type="button" class="button primary preview-sample-button" data-preview-sample="book-chapter" aria-label="Preview Book Chapter XML">Book Chapter</button>
           <button type="button" class="button primary preview-sample-button" data-preview-sample="article" aria-label="Preview Article XML">Article</button>
           <button type="button" class="button primary preview-sample-button" data-preview-sample="resource-sharing" aria-label="Preview Resource Sharing XML" hidden>Resource Sharing</button>

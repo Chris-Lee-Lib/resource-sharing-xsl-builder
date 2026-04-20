@@ -1,5 +1,6 @@
 const form = document.querySelector('#builder-form');
 const preview = document.querySelector('#xsl-preview');
+const xslLineCount = document.querySelector('#xsl-line-count');
 const renderedPreview = document.querySelector('#rendered-preview');
 const resetButton = document.querySelector('#reset-button');
 const copyXslButton = document.querySelector('#copy-xsl-button');
@@ -507,6 +508,10 @@ const previewSampleDefinitions = {
     label: 'Book',
     file: './sample-input.xml'
   },
+  'book-courier': {
+    label: 'Book (Courier)',
+    file: './sample-input-CSU.xml'
+  },
   'book-chapter': {
     label: 'Book Chapter',
     file: './sample-book-chapter.xml'
@@ -683,6 +688,7 @@ function readFormState() {
     customHoldShelfLetterXsl: form.elements.customHoldShelfLetterXsl?.value || '',
       includeLogo: form.elements.includeLogo.value,
       logoUrl: form.elements.logoUrl.value.trim(),
+      includePartnerEmail: getActiveFieldValue('includePartnerEmail', selectedLetter),
       includePatronId: getActiveFieldValue('includePatronId', selectedLetter),
       receiveSlipFormat: getActiveFieldValue('receiveSlipFormat', selectedLetter),
       labelChoice: getActiveFieldValue('labelChoice', selectedLetter),
@@ -701,6 +707,7 @@ function readFormState() {
     accessibilityCustomStatementText: form.elements.accessibilityCustomStatementText?.value || '',
     includeCopyrightStatement: getActiveFieldValue('includeCopyrightStatement', selectedLetter),
     copyrightStatementText: form.elements.copyrightStatementText?.value || DEFAULT_COPYRIGHT_STATEMENT,
+    libraryGroup: getActiveFieldValue('libraryGroup', selectedLetter),
     metadataOptions: Array.from(form.querySelectorAll('input[name="metadataOptions"]:checked')).map((input) => input.value)
   };
 }
@@ -777,6 +784,10 @@ function getLetterDefinition(letterType) {
 }
 
 function getAllowedPreviewSamples(letterType) {
+  if (letterType === 'pull-slip-letter' && getActiveFieldValue('libraryGroup', letterType) === 'california-state-university') {
+    return ['book', 'book-courier', 'book-chapter', 'article'];
+  }
+
   return previewSamplesByLetter[letterType] || ['book'];
 }
 
@@ -1122,6 +1133,20 @@ function applyCreateDateChoice(templateText, state) {
 
   if (state.includeCreateDate === 'no') {
     return removeSectionByPattern(templateText, createDatePattern);
+  }
+
+  return templateText;
+}
+
+function applyPartnerEmailChoice(templateText, state) {
+  const partnerEmailPattern = /[ \t]*<!-- BEGIN OPTIONAL PARTNER EMAIL -->[\s\S]*?<!-- END OPTIONAL PARTNER EMAIL -->[^\S\r\n]*/;
+
+  if (!['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
+    return templateText;
+  }
+
+  if (state.includePartnerEmail === 'no') {
+    return removeSectionByPattern(templateText, partnerEmailPattern);
   }
 
   return templateText;
@@ -1495,8 +1520,13 @@ const BORROWING_RECEIVE_SPLIT_ELIGIBLE_METADATA = new Set([
 function shouldUseSectionSplitLayout(state) {
   const metadataCount = (state.metadataOptions || []).filter((option) => PHYSICAL_SPLIT_ELIGIBLE_METADATA.has(option)).length;
   const hasCheckboxConditionReport = state.noteAreaType === 'checkboxes';
+  const labelsTriggerSplit = !(
+    state.letterType === 'pull-slip-letter'
+    && state.libraryGroup === 'california-state-university'
+  );
+
   return ['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)
-    && ((state.labelChoice !== '' && state.labelChoice !== 'no-label') || state.includeCustomMessage === 'yes')
+    && (((state.labelChoice !== '' && state.labelChoice !== 'no-label') && labelsTriggerSplit) || state.includeCustomMessage === 'yes')
     && (state.labelChoice === 'both-labels' || metadataCount >= 8 || hasCheckboxConditionReport || state.includeCustomMessage === 'yes');
 }
 
@@ -1798,6 +1828,307 @@ function extractDigitalSectionBlock(templateText) {
     digitalSectionBlock: match[0],
     templateWithoutDigitalSection: templateText.replace(pattern, '')
   };
+}
+
+function mapPhysicalSectionBlock(templateText, mapper) {
+  const { physicalSectionBlock } = extractPhysicalSectionBlock(templateText);
+
+  if (!physicalSectionBlock) {
+    return templateText;
+  }
+
+  const updatedBlock = mapper(physicalSectionBlock);
+  return updatedBlock === physicalSectionBlock
+    ? templateText
+    : templateText.replace(physicalSectionBlock, updatedBlock);
+}
+
+function mapDigitalSectionBlock(templateText, mapper) {
+  const { digitalSectionBlock } = extractDigitalSectionBlock(templateText);
+
+  if (!digitalSectionBlock) {
+    return templateText;
+  }
+
+  const updatedBlock = mapper(digitalSectionBlock);
+  return updatedBlock === digitalSectionBlock
+    ? templateText
+    : templateText.replace(digitalSectionBlock, updatedBlock);
+}
+
+function applyPullSlipPhysicalSectionCustomizations(templateText, state) {
+  return mapPhysicalSectionBlock(templateText, (physicalSectionBlock) => {
+    let output = physicalSectionBlock;
+    output = applyMetadataSelection(output, state);
+    output = applyNoteAreaChoice(output, state);
+    output = applyCustomMessageChoice(output, state);
+    output = applySelectedLabelChoice(output, state);
+    return output;
+  });
+}
+
+function applyPullSlipDigitalSectionCustomizations(templateText, state) {
+  return mapDigitalSectionBlock(templateText, (digitalSectionBlock) => {
+    let output = digitalSectionBlock;
+    output = applyMetadataSelection(output, state);
+    output = applyCustomMessageChoice(output, state);
+    output = applyDigitalBarcodePlacementChoice(output, state);
+    output = applyAccessibilityStatementChoice(output, state);
+    output = applyCopyrightStatementChoice(output, state);
+    return output;
+  });
+}
+
+function getCsuCourierRouteCondition() {
+  return [
+    "notification_data/pod_name = 'California State Network'",
+    "notification_data/pod_name = 'West Coast Courier Pod'",
+    "notification_data/pod_name = 'West Coast Pending Pod'",
+    "contains(notification_data/group_qualifier, '01STMARYSCA')",
+    "notification_data/partner_name = 'Bakersfield'",
+    "notification_data/partner_name = 'Channel Islands'",
+    "notification_data/partner_name = 'Chico'",
+    "notification_data/partner_name = 'Dominguez Hills'",
+    "notification_data/partner_name = 'East Bay'",
+    "notification_data/partner_name = 'Fresno'",
+    "notification_data/partner_name = 'Fullerton'",
+    "notification_data/partner_name = 'Humboldt'",
+    "notification_data/partner_name = 'Long Beach'",
+    "notification_data/partner_name = 'Los Angeles'",
+    "notification_data/partner_name = 'Maritime Academy'",
+    "notification_data/partner_name = 'Monterey Bay'",
+    "notification_data/partner_name = 'Moss Landing'",
+    "notification_data/partner_name = 'California State University Moss Landing Marine Laboratories - MLML/MBARI Research Library'",
+    "notification_data/partner_name = 'California State University Moss Landing Marine Laboratories Library'",
+    "notification_data/partner_name = 'Northridge'",
+    "notification_data/partner_name = 'Pomona'",
+    "notification_data/partner_name = 'Sacramento'",
+    "notification_data/partner_name = 'San Bernardino'",
+    "notification_data/partner_name = 'San Diego'",
+    "notification_data/partner_name = 'San Francisco'",
+    "notification_data/partner_name = 'San Jose'",
+    "notification_data/partner_name = 'San Luis Obispo'",
+    "notification_data/partner_name = 'San Marcos'",
+    "notification_data/partner_name = 'Sonoma'",
+    "notification_data/partner_name = 'Stanislaus'"
+  ].join('\n                        or ');
+}
+
+function buildCsuLoanedToBlock() {
+  return [
+    '<xsl:variable name="csuLoanedToImage">',
+    '  <xsl:choose>',
+    `    <xsl:when test="notification_data/partner_name='CSU Bakersfield - CSUB Library' or notification_data/partner_name='Bakersfield' or notification_data/incoming_request/borrowing_institution='California State Univ Bakersfield'">https://ispiecsu.files.wordpress.com/2023/03/bakersfield.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, Channel Islands - John Spoor Broome Library' or notification_data/partner_name='Channel Islands' or notification_data/incoming_request/borrowing_institution='California State Univ Channel Islands'">https://ispiecsu.files.wordpress.com/2023/03/channel-islands.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='CSU, Chico - Meriam Library' or notification_data/partner_name='Chico' or notification_data/incoming_request/borrowing_institution='California State University, Chico'">https://ispiecsu.files.wordpress.com/2023/03/chico-2.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, Dominguez Hills - University Library' or notification_data/partner_name='Dominguez Hills' or notification_data/incoming_request/borrowing_institution='CSU Dominguez Hills'">https://ispiecsu.files.wordpress.com/2023/03/dominguez-hills.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, East Bay - Hayward' or notification_data/partner_name='East Bay' or notification_data/incoming_request/borrowing_institution='California State Univ., East Bay'">https://ispiecsu.files.wordpress.com/2023/03/east-bay.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='Fresno State - FRESNO STATE MAIN' or notification_data/partner_name='Fresno' or notification_data/incoming_request/borrowing_institution='California State University Fresno'">https://ispiecsu.files.wordpress.com/2023/03/fresno-1.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, Fullerton - Pollak Library' or notification_data/partner_name='Fullerton' or notification_data/incoming_request/borrowing_institution='California State Univ., Fullerton'">https://ispiecsu.files.wordpress.com/2023/03/fullerton-23.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='Cal Poly Humboldt - Humboldt State University Library' or notification_data/partner_name='Humboldt' or notification_data/incoming_request/borrowing_institution='Humboldt State University'">https://ispiecsu.files.wordpress.com/2023/03/humboldt.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, Long Beach - University Library' or notification_data/partner_name='Long Beach' or notification_data/incoming_request/borrowing_institution='California State Univ., Long Beach'">https://ispiecsu.files.wordpress.com/2023/03/long-beach.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, Los Angeles - John F Kennedy Memorial Library' or notification_data/partner_name='Los Angeles' or notification_data/incoming_request/borrowing_institution='CSU Los Angeles'">https://ispiecsu.files.wordpress.com/2023/03/los-angeles.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='Cal Maritime - California Maritime Academy Library' or notification_data/partner_name='Maritime Academy' or notification_data/incoming_request/borrowing_institution='California State Univ Maritime'">https://ispiecsu.files.wordpress.com/2023/03/maritime.jpg</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, Monterey Bay - CSU Monterey Bay Library' or notification_data/partner_name='Monterey Bay' or notification_data/incoming_request/borrowing_institution='California State Univ Monterey Bay'">https://ulmsguide.calstate.edu/sites/default/files/styles/large/public/2025-04/Monterey%20Bay.png?itok=oAtRrLXz</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, Northridge - Interlibrary Loan' or notification_data/partner_name='Northridge' or notification_data/incoming_request/borrowing_institution='California State Univ., Northridge'">https://ispiecsu.files.wordpress.com/2023/03/northridge-2.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State Polytechnic University Pomona - Cal Poly Pomona University Library' or notification_data/partner_name='Pomona' or notification_data/incoming_request/borrowing_institution='California State Polytechnic Univ., Pomona'">https://ispiecsu.files.wordpress.com/2023/03/pomona.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='Sacramento State - University Library' or notification_data/partner_name='Sacramento' or notification_data/incoming_request/borrowing_institution='California State University, Sacramento'">https://ispiecsu.files.wordpress.com/2023/03/sacramento.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, San Bernardino' or notification_data/partner_name='San Bernardino' or notification_data/incoming_request/borrowing_institution='California State University, San Bernardino'">https://ispiecsu.files.wordpress.com/2023/03/csusb_logo_23pt.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='San Diego State University Library - SDSU Library' or notification_data/partner_name='San Diego' or notification_data/incoming_request/borrowing_institution='San Diego State University'">https://ispiecsu.files.wordpress.com/2023/03/san-diego.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='San Francisco State University - Main Library' or notification_data/partner_name='San Francisco' or notification_data/incoming_request/borrowing_institution='San Francisco State Univ.'">https://ispiecsu.files.wordpress.com/2023/03/san-francisco.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='San Jose State University - SJSU Library' or notification_data/partner_name='San Jose' or notification_data/incoming_request/borrowing_institution='San Jose State University'">https://ispiecsu.files.wordpress.com/2023/03/san-jose-2.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='Cal Poly University San Luis Obispo - Robert E. Kennedy Library' or notification_data/partner_name='San Luis Obispo' or notification_data/incoming_request/borrowing_institution='California Polytechnic State Univ, San Luis Obispo'">https://ispiecsu.files.wordpress.com/2023/03/san-luis-obispo-2.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University San Marcos - Library' or notification_data/partner_name='San Marcos' or notification_data/incoming_request/borrowing_institution='Calif State Univ., San Marcos'">https://ispiecsu.files.wordpress.com/2023/03/san-marcos.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='Sonoma State University - University Library' or notification_data/partner_name='Sonoma' or notification_data/incoming_request/borrowing_institution='Sonoma State University'">https://ispiecsu.files.wordpress.com/2023/03/sonoma-1.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University, Stanislaus - CSU Stanislaus Library' or notification_data/partner_name='Stanislaus' or notification_data/incoming_request/borrowing_institution='California State University, Stanislaus'">https://ispiecsu.files.wordpress.com/2023/03/stanislaus-1.png</xsl:when>`,
+    `    <xsl:when test="notification_data/partner_name='California State University Moss Landing Marine Laboratories - MLML/MBARI Research Library' or notification_data/partner_name='Moss Landing'">https://ispiecsu.files.wordpress.com/2023/03/moss-landing.png</xsl:when>`,
+    '    <xsl:otherwise />',
+    '  </xsl:choose>',
+    '</xsl:variable>',
+    '<div style="height:30px;"></div>',
+    '<div style="width:336px; min-width:336px; max-width:336px; text-align:center; font-weight:bold;">---Loaned To---</div>',
+    '<div style="height:6px;"></div>',
+    '<xsl:if test="normalize-space($csuLoanedToImage) != \'\'">',
+    '  <div style="width:336px; min-width:336px; max-width:336px; text-align:center;">',
+    '    <img src="{$csuLoanedToImage}" alt="Loaned To Logo" style="display:block; margin:0 auto; max-height:110px; max-width:336px;" />',
+    '  </div>',
+    '</xsl:if>'
+  ].join('\n');
+}
+
+function buildCsuProvidedByBlock(state, useSplitLayout) {
+  const sharedLogoMarkup = useSplitLayout
+    ? [
+        '<div style="width:336px; min-width:336px; max-width:336px; text-align:center; font-weight:bold;">---Provided By---</div>',
+        '<div style="height:6px;"></div>',
+        '<div style="width:336px; min-width:336px; max-width:336px; text-align:center;">',
+        `  <img src="${escapeHtml(state.logoUrl || '')}" alt="Provided By Logo" style="display:block; margin:0 auto; max-height:110px; max-width:336px;" />`,
+        '</div>',
+        buildCsuLoanedToBlock()
+      ].join('\n')
+    : [
+        '<tr>',
+        '  <td style="width:350px; text-align:center;">',
+        '    <div style="width:350px; max-width:350px; text-align:center; font-weight:bold;">---Provided By---</div>',
+        '    <div style="height:6px;"></div>',
+        `    <img src="${escapeHtml(state.logoUrl || '')}" alt="Provided By Logo" style="display:block; margin:0 auto; max-height:110px; max-width:350px;" />`,
+        '    <xsl:variable name="csuLoanedToImage">',
+        '      <xsl:choose>',
+        "        <xsl:when test=\"notification_data/partner_name='CSU Bakersfield - CSUB Library' or notification_data/partner_name='Bakersfield' or notification_data/incoming_request/borrowing_institution='California State Univ Bakersfield'\">https://ispiecsu.files.wordpress.com/2023/03/bakersfield.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, Channel Islands - John Spoor Broome Library' or notification_data/partner_name='Channel Islands' or notification_data/incoming_request/borrowing_institution='California State Univ Channel Islands'\">https://ispiecsu.files.wordpress.com/2023/03/channel-islands.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='CSU, Chico - Meriam Library' or notification_data/partner_name='Chico' or notification_data/incoming_request/borrowing_institution='California State University, Chico'\">https://ispiecsu.files.wordpress.com/2023/03/chico-2.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, Dominguez Hills - University Library' or notification_data/partner_name='Dominguez Hills' or notification_data/incoming_request/borrowing_institution='CSU Dominguez Hills'\">https://ispiecsu.files.wordpress.com/2023/03/dominguez-hills.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, East Bay - Hayward' or notification_data/partner_name='East Bay' or notification_data/incoming_request/borrowing_institution='California State Univ., East Bay'\">https://ispiecsu.files.wordpress.com/2023/03/east-bay.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='Fresno State - FRESNO STATE MAIN' or notification_data/partner_name='Fresno' or notification_data/incoming_request/borrowing_institution='California State University Fresno'\">https://ispiecsu.files.wordpress.com/2023/03/fresno-1.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, Fullerton - Pollak Library' or notification_data/partner_name='Fullerton' or notification_data/incoming_request/borrowing_institution='California State Univ., Fullerton'\">https://ispiecsu.files.wordpress.com/2023/03/fullerton-23.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='Cal Poly Humboldt - Humboldt State University Library' or notification_data/partner_name='Humboldt' or notification_data/incoming_request/borrowing_institution='Humboldt State University'\">https://ispiecsu.files.wordpress.com/2023/03/humboldt.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, Long Beach - University Library' or notification_data/partner_name='Long Beach' or notification_data/incoming_request/borrowing_institution='California State Univ., Long Beach'\">https://ispiecsu.files.wordpress.com/2023/03/long-beach.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, Los Angeles - John F Kennedy Memorial Library' or notification_data/partner_name='Los Angeles' or notification_data/incoming_request/borrowing_institution='CSU Los Angeles'\">https://ispiecsu.files.wordpress.com/2023/03/los-angeles.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='Cal Maritime - California Maritime Academy Library' or notification_data/partner_name='Maritime Academy' or notification_data/incoming_request/borrowing_institution='California State Univ Maritime'\">https://ispiecsu.files.wordpress.com/2023/03/maritime.jpg</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, Monterey Bay - CSU Monterey Bay Library' or notification_data/partner_name='Monterey Bay' or notification_data/incoming_request/borrowing_institution='California State Univ Monterey Bay'\">https://ulmsguide.calstate.edu/sites/default/files/styles/large/public/2025-04/Monterey%20Bay.png?itok=oAtRrLXz</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, Northridge - Interlibrary Loan' or notification_data/partner_name='Northridge' or notification_data/incoming_request/borrowing_institution='California State Univ., Northridge'\">https://ispiecsu.files.wordpress.com/2023/03/northridge-2.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State Polytechnic University Pomona - Cal Poly Pomona University Library' or notification_data/partner_name='Pomona' or notification_data/incoming_request/borrowing_institution='California State Polytechnic Univ., Pomona'\">https://ispiecsu.files.wordpress.com/2023/03/pomona.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='Sacramento State - University Library' or notification_data/partner_name='Sacramento' or notification_data/incoming_request/borrowing_institution='California State University, Sacramento'\">https://ispiecsu.files.wordpress.com/2023/03/sacramento.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, San Bernardino' or notification_data/partner_name='San Bernardino' or notification_data/incoming_request/borrowing_institution='California State University, San Bernardino'\">https://ispiecsu.files.wordpress.com/2023/03/csusb_logo_23pt.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='San Diego State University Library - SDSU Library' or notification_data/partner_name='San Diego' or notification_data/incoming_request/borrowing_institution='San Diego State University'\">https://ispiecsu.files.wordpress.com/2023/03/san-diego.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='San Francisco State University - Main Library' or notification_data/partner_name='San Francisco' or notification_data/incoming_request/borrowing_institution='San Francisco State Univ.'\">https://ispiecsu.files.wordpress.com/2023/03/san-francisco.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='San Jose State University - SJSU Library' or notification_data/partner_name='San Jose' or notification_data/incoming_request/borrowing_institution='San Jose State University'\">https://ispiecsu.files.wordpress.com/2023/03/san-jose-2.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='Cal Poly University San Luis Obispo - Robert E. Kennedy Library' or notification_data/partner_name='San Luis Obispo' or notification_data/incoming_request/borrowing_institution='California Polytechnic State Univ, San Luis Obispo'\">https://ispiecsu.files.wordpress.com/2023/03/san-luis-obispo-2.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University San Marcos - Library' or notification_data/partner_name='San Marcos' or notification_data/incoming_request/borrowing_institution='Calif State Univ., San Marcos'\">https://ispiecsu.files.wordpress.com/2023/03/san-marcos.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='Sonoma State University - University Library' or notification_data/partner_name='Sonoma' or notification_data/incoming_request/borrowing_institution='Sonoma State University'\">https://ispiecsu.files.wordpress.com/2023/03/sonoma-1.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University, Stanislaus - CSU Stanislaus Library' or notification_data/partner_name='Stanislaus' or notification_data/incoming_request/borrowing_institution='California State University, Stanislaus'\">https://ispiecsu.files.wordpress.com/2023/03/stanislaus-1.png</xsl:when>",
+        "        <xsl:when test=\"notification_data/partner_name='California State University Moss Landing Marine Laboratories - MLML/MBARI Research Library' or notification_data/partner_name='Moss Landing'\">https://ispiecsu.files.wordpress.com/2023/03/moss-landing.png</xsl:when>",
+        '        <xsl:otherwise />',
+        '      </xsl:choose>',
+        '    </xsl:variable>',
+        '    <div style="height:30px;"></div>',
+        '    <div style="width:350px; max-width:350px; text-align:center; font-weight:bold;">---Loaned To---</div>',
+        '    <div style="height:6px;"></div>',
+        '    <xsl:if test="normalize-space($csuLoanedToImage) != \'\'">',
+        '      <img src="{$csuLoanedToImage}" alt="Loaned To Logo" style="display:block; margin:0 auto; max-height:110px; max-width:350px;" />',
+        '    </xsl:if>',
+        '  </td>',
+        '</tr>'
+      ].join('\n');
+
+  return sharedLogoMarkup;
+}
+
+function applyFulIncomingCsuPodLogo(templateText, state) {
+  if (
+    state.letterType !== 'pull-slip-letter'
+    || state.libraryGroup !== 'california-state-university'
+    || state.includeLogo !== 'yes'
+  ) {
+    return templateText;
+  }
+
+  const csuPodLogoTemplate = [
+    '  <xsl:template name="print-library-logo">',
+    '    <xsl:variable name="podName" select="normalize-space(notification_data/pod_name)" />',
+    '    <xsl:variable name="logo">',
+    '      <xsl:choose>',
+    "        <xsl:when test=\"$podName='California State Network'\">https://ispiecsu.files.wordpress.com/2023/03/csu-plus-small.png</xsl:when>",
+    "        <xsl:when test=\"$podName='West Coast Courier Pod' or $podName='West Coast Pending Pod'\">https://ispiecsu.files.wordpress.com/2023/08/west-coast-small-3.png</xsl:when>",
+    `        <xsl:otherwise>${escapeHtml(state.logoUrl || '')}</xsl:otherwise>`,
+    '      </xsl:choose>',
+    '    </xsl:variable>',
+    '',
+    '    <table border="0" cellspacing="0" cellpadding="0" style="width:350px; max-width:350px; margin:0; border-collapse:collapse;">',
+    '      <tr><td height="12">&#160;</td></tr>',
+    '      <tr>',
+    '        <td align="center" style="text-align:center; width:350px;">',
+    '          <img src="{$logo}" alt="Library Logo" style="display:block; margin:0 auto; height:100px; width:auto; max-width:350px;" />',
+    '        </td>',
+    '      </tr>',
+    '      <tr><td height="12">&#160;</td></tr>',
+    '    </table>',
+    '  </xsl:template>'
+  ].join('\n');
+
+  return templateText.replace(
+    /  <xsl:template name="print-library-logo">[\s\S]*?  <\/xsl:template>/,
+    csuPodLogoTemplate
+  );
+}
+
+function applyFulIncomingCsuHidePhysicalLabels(templateText, state) {
+  if (state.letterType !== 'pull-slip-letter' || state.libraryGroup !== 'california-state-university') {
+    return templateText;
+  }
+
+  const labelStarts = findAllLabelTableStarts(templateText);
+
+  if (!labelStarts.length) {
+    return templateText;
+  }
+
+  const routeCondition = getCsuCourierRouteCondition();
+  const labelBlocks = labelStarts
+    .map((startIndex) => findLabelBlockFromStart(templateText, startIndex))
+    .filter(Boolean);
+
+  const wrappedLabelBlocks = labelBlocks.map((block) => {
+    let wrapStart = block.start;
+    const labelPrefix = templateText.slice(Math.max(0, block.start - 220), block.start);
+    const movedLabelPrefixMatch = labelPrefix.match(
+      /<div style="width:336px; min-width:336px; max-width:336px; font-weight:bold;">---(?:Shipping|Return) Label---<\/div>\s*<div style="height:6px;"><\/div>\s*$/
+    );
+
+    if (movedLabelPrefixMatch) {
+      wrapStart = block.start - movedLabelPrefixMatch[0].length;
+    }
+
+    return {
+      ...block,
+      wrapStart
+    };
+  });
+
+  const firstVisibleLabelStart = wrappedLabelBlocks.reduce(
+    (minStart, block) => Math.min(minStart, block.wrapStart),
+    Number.POSITIVE_INFINITY
+  );
+  const shouldUseSplitLayout = shouldUseSectionSplitLayout(state);
+  const providedByBlock = buildCsuProvidedByBlock(state, shouldUseSplitLayout);
+
+  return wrappedLabelBlocks
+    .slice()
+    .sort((a, b) => b.start - a.start)
+    .reduce((output, block) => {
+      const wrapStart = block.wrapStart;
+
+      if (output.slice(wrapStart, block.end).includes('BEGIN CSU OPTIONAL HIDE LABEL')) {
+        return output;
+      }
+
+      const wrappedBlock = wrapStart === firstVisibleLabelStart && state.includeLogo === 'yes' && state.logoUrl
+        ? [
+            '                    <!-- BEGIN CSU OPTIONAL HIDE LABEL -->',
+            '                    <xsl:choose>',
+            '                      <xsl:when test="',
+            `                        ${routeCondition}`,
+            '                      ">',
+            providedByBlock,
+            '                      </xsl:when>',
+            '                      <xsl:otherwise>',
+            output.slice(wrapStart, block.end).trim(),
+            '                      </xsl:otherwise>',
+            '                    </xsl:choose>',
+            '                    <!-- END CSU OPTIONAL HIDE LABEL -->'
+          ].join('\n')
+        : [
+            '                    <!-- BEGIN CSU OPTIONAL HIDE LABEL -->',
+            '                    <xsl:if test="not(',
+            `                        ${routeCondition}`,
+            '                      )">',
+            output.slice(wrapStart, block.end).trim(),
+            '                    </xsl:if>',
+            '                    <!-- END CSU OPTIONAL HIDE LABEL -->'
+          ].join('\n');
+
+      return `${output.slice(0, wrapStart)}${wrappedBlock}${output.slice(block.end)}`;
+    }, templateText);
 }
 
 function extractMarkedBlock(text, beginMarker, endMarker) {
@@ -2325,31 +2656,36 @@ function applyTemplateReplacements(templateText, state) {
     );
   }
 
-    if (['pull-slip-letter', 'pick-from-shelf', 'borrowing-receive-slip'].includes(state.letterType)) {
-      output = applyMetadataSelection(output, state);
+    if (state.letterType === 'pull-slip-letter') {
+      output = applyPartnerEmailChoice(output, state);
+      output = applyPullSlipPhysicalSectionCustomizations(output, state);
+      output = applyPullSlipDigitalSectionCustomizations(output, state);
+      output = applyDigitalLogoChoice(output, state);
+    } else {
+      if (['pull-slip-letter', 'pick-from-shelf', 'borrowing-receive-slip'].includes(state.letterType)) {
+        output = applyMetadataSelection(output, state);
+      }
+
+      if (['pull-slip-letter', 'pick-from-shelf', 'borrowing-receive-slip'].includes(state.letterType)) {
+        output = applyNoteAreaChoice(output, state);
+      }
+
+      if (['pull-slip-letter', 'pick-from-shelf', 'borrowing-receive-slip'].includes(state.letterType)) {
+        output = applyCustomMessageChoice(output, state);
+      }
+
+      if (['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
+        output = applySelectedLabelChoice(output, state);
+      }
     }
-
-    if (['pull-slip-letter', 'pick-from-shelf', 'borrowing-receive-slip'].includes(state.letterType)) {
-      output = applyNoteAreaChoice(output, state);
-    }
-
-    if (['pull-slip-letter', 'pick-from-shelf', 'borrowing-receive-slip'].includes(state.letterType)) {
-      output = applyCustomMessageChoice(output, state);
-    }
-
-  if (state.letterType === 'pull-slip-letter') {
-    output = applyDigitalLogoChoice(output, state);
-    output = applyDigitalBarcodePlacementChoice(output, state);
-    output = applyAccessibilityStatementChoice(output, state);
-    output = applyCopyrightStatementChoice(output, state);
-  }
-
-  if (['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
-    output = applySelectedLabelChoice(output, state);
-  }
 
     if (['pull-slip-letter', 'pick-from-shelf'].includes(state.letterType)) {
       output = applySectionSplitLayout(output, state);
+    }
+
+    if (state.letterType === 'pull-slip-letter') {
+      output = applyFulIncomingCsuHidePhysicalLabels(output, state);
+      output = applyFulIncomingCsuPodLogo(output, state);
     }
 
     if (state.letterType === 'borrowing-receive-slip') {
@@ -2544,10 +2880,22 @@ async function getTemplateText(state) {
 
 function syncPreviewSampleButtons() {
   const allowedSamples = new Set(getAllowedPreviewSamples(form.elements.letterType.value));
+  const isCsuPullSlip = form.elements.letterType.value === 'pull-slip-letter'
+    && getActiveFieldValue('libraryGroup', 'pull-slip-letter') === 'california-state-university';
 
   previewSampleButtons.forEach((button) => {
     const sampleType = button.dataset.previewSample || '';
     const isAllowed = allowedSamples.has(sampleType);
+
+    if (sampleType === 'book') {
+      button.textContent = isCsuPullSlip ? 'Book (Rapido)' : 'Book';
+      button.setAttribute('aria-label', isCsuPullSlip ? 'Preview Book Rapido XML' : 'Preview Book XML');
+    }
+
+    if (sampleType === 'book-courier') {
+      button.textContent = 'Book (Courier)';
+      button.setAttribute('aria-label', 'Preview Book Courier XML');
+    }
 
     button.hidden = !isAllowed;
 
@@ -2761,7 +3109,7 @@ function buildPickFromShelfFallbackPreview(xmlText, state) {
         <table border="0" cellspacing="0" cellpadding="0" style="width:350px; max-width:350px; table-layout:fixed;">
           ${partnerName ? `<tr><td style="font-size:14pt; width:350px;"><strong>${escapeHtml(partnerName)}</strong></td></tr>` : ''}
           ${podName ? `<tr><td style="width:350px;"><b>Pod:&nbsp;</b>${escapeHtml(podName)}</td></tr>` : ''}
-          ${requesterEmail ? `<tr><td style="width:350px;"><b>Requester Email:</b> ${escapeHtml(requesterEmail)}</td></tr>` : ''}
+          ${state.includePartnerEmail === 'no' || !requesterEmail ? '' : `<tr><td style="width:350px;"><b>Requester Email:</b> ${escapeHtml(requesterEmail)}</td></tr>`}
           ${state.includeCreateDate === 'no' || !formattedCreateDate ? '' : `<tr><td style="width:350px;"><b>Date:&nbsp;</b>${escapeHtml(formattedCreateDate)}</td></tr>`}
         </table>
         ${logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="Library Logo" style="display:block; margin:12px auto; max-height:100px; max-width:350px;" />` : ''}
@@ -2988,6 +3336,16 @@ function downloadPreviewAsText() {
   showToast('Successfully downloaded');
 }
 
+function updateXslLineCount(text) {
+  if (!xslLineCount) {
+    return;
+  }
+
+  const normalizedText = typeof text === 'string' ? text.replace(/\r\n/g, '\n') : '';
+  const lineCount = normalizedText ? normalizedText.split('\n').length : 0;
+  xslLineCount.textContent = `Line count: ${lineCount}`;
+}
+
 async function renderTransformedOutput(xslText, state) {
   renderedPreview.innerHTML = '';
   renderedPreview.classList.toggle('section-split-layout', shouldUseSectionSplitLayout(state) || shouldUseBorrowingReceiveSplitLayout(state));
@@ -3053,6 +3411,7 @@ async function render() {
 
   if (!state.letterType) {
     preview.textContent = '';
+    updateXslLineCount('');
     renderedPreview.innerHTML = '';
     renderedPreview.setAttribute('aria-busy', 'false');
     return;
@@ -3077,17 +3436,20 @@ async function render() {
   }
 
   preview.textContent = 'Loading template preview...';
+  updateXslLineCount(preview.textContent);
   renderedPreview.textContent = 'Rendering sample output...';
   renderedPreview.setAttribute('aria-busy', 'true');
 
   try {
     const xslText = await getTemplateText(state);
     preview.textContent = xslText;
+    updateXslLineCount(xslText);
     await renderTransformedOutput(xslText, state);
   } catch (error) {
     console.error(error);
     const fallbackXsl = assembleScaffoldXsl(state);
     preview.textContent = fallbackXsl;
+    updateXslLineCount(fallbackXsl);
     await renderTransformedOutput(fallbackXsl, state);
   }
   renderedPreview.setAttribute('aria-busy', 'false');
@@ -3137,6 +3499,11 @@ form.elements.includeAccessibilityStatement.addEventListener('change', () => {
 
 form.elements.includeCustomMessage?.addEventListener('change', () => {
   syncQuestionsFromChange('includeCustomMessage');
+});
+
+form.elements.libraryGroup?.addEventListener('change', () => {
+  syncSelectedPreviewSample();
+  syncPreviewSampleButtons();
 });
 
 form.elements.accessibilityStatementMode?.addEventListener('change', () => {
@@ -3204,6 +3571,7 @@ resetButton.addEventListener('click', () => {
     syncSelectedPreviewSample();
     syncPreviewSampleButtons();
     preview.textContent = '';
+    updateXslLineCount('');
     renderedPreview.innerHTML = '';
   });
 });
@@ -3212,3 +3580,4 @@ syncLetterSpecificQuestions();
 syncSelectedPreviewSample();
 syncPreviewSampleButtons();
 syncMetadataButtonAccessibility();
+updateXslLineCount(preview.textContent);

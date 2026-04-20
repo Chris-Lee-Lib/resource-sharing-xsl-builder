@@ -541,6 +541,14 @@ textarea {
   content: 'Rendered output will appear here after you generate the XSL.';
 }
 
+.xsl-line-count {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin: 10px 4px 0;
+  text-align: right;
+}
+
 .scroll-note {
   color: var(--muted);
   font-size: 0.92rem;
